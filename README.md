@@ -126,7 +126,7 @@ g++ -Wall -I../src/headers -L../src/lib threshold.cxx -o threshold -lgsl -lgslcb
 
 g++ -Wall -I../src/headers -L../src/lib steady_state.cxx -o steady_state -lgsl -lgslcblas -lm -larmadillo
 ./steady_state
-
+```
 
 ---
 
