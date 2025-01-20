@@ -1,0 +1,9 @@
+Steady-state polarizability calculation results:
+  Metal model: drude
+  Metal type: silver
+  Core material: silica
+  Spectral range: [2.6, 3] eV
+  Solvent: water
+  Radius ratio: 0.6
+
+Check simulation output for detailed results.

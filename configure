@@ -1,0 +1,28 @@
+#!/bin/bash
+echo "Checking for dependencies..."
+
+if ! command -v g++ &> /dev/null; then
+  echo "Error: g++ is not installed."
+  exit 1
+fi
+
+echo "Checking for armadillo..."
+if ! ldconfig -p | grep "libarmadillo.so" &> /dev/null; then
+  echo "Error: Library armadillo not found. Please install it."
+  exit 1
+fi
+
+echo "Checking for gsl..."
+if ! ldconfig -p | grep "libgsl.so" &> /dev/null; then
+  echo "Error: Library gsl not found. Please install it."
+  exit 1
+fi
+
+echo "Checking for gslcblas..."
+if ! ldconfig -p | grep "libgslcblas.so" &> /dev/null; then
+  echo "Error: Library gslcblas not found. Please install it."
+  exit 1
+fi
+
+echo "Dependencies are satisfied."
+echo "Ready to build!"
