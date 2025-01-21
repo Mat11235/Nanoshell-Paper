@@ -53,20 +53,20 @@ To compile the project, ensure the following dependencies are installed:
 ### 1. `data/input/nanosphere_eV.dat`
 This file describes the nanoshell structure parameters:
 
-| Parameter                     | Description                                                                                          | Example Value |
-|-------------------------------|------------------------------------------------------------------------------------------------------|---------------|
-| External radius (nm)          | Radius of the nanoshell, \(a\) in the paper                                                        | 10            |
-| Emission permittivity (eV)    | \(\hbar \Delta\), amplitude of the emission permittivity of the gain medium                        | 0.15          |
-| Emission frequency (eV)       | \(\hbar \omega_g\), emission frequency of the gain medium                                         | 2.8122        |
-| Gain level                    | \(-G\), negative gain level (future versions may switch to \(G\))                                | -0.033        |
-| Spectrum bounds (eV)          | \(\omega_{min}\), \(\omega_{max}\), bounds of the spectral range of interest                    | 2.0, 4.5      |
-| Metal type                    | Material of the shell (e.g., `silver`)                                                             | silver        |
-| Metal model                   | Model for the metal (`drude`, `spline`)                                                            | drude         |
-| Gain medium model             | Model for the active core medium (`lorentz`, `flat`)                                               | lorentz       |
-| Host material                 | Surrounding medium (e.g., `water`)                                                                | water         |
-| Excitation field amplitude    | \(E_0\), excitation field (arbitrary units); compare with saturation field amplitude \(E_{sat}\) | 1.e-30        |
-| Radius ratio                  | \(\rho\), ratio of inner to outer radius                                                         | 0.6           |
-| Core material                 | Material of the nanoshell core (e.g., `silica`)                                                   | silica        |
+| Parameter                     | Description                                                                                                           | Example Value |
+|-------------------------------|-----------------------------------------------------------------------------------------------------------------------|---------------|
+| External radius (nm)          | Radius of the nanoshell, \(a\) in the paper                                                                           | 10            |
+| Emission permittivity (eV)    | \(\hbar \Delta\), amplitude of the emission permittivity of the gain medium                                           | 0.15          |
+| Emission frequency (eV)       | \(\hbar \omega_g\), emission frequency of the gain medium                                                             | 2.8122        |
+| Gain level                    | \(-G\), negative gain level (future versions may switch to \(G\))                                                     | -0.033        |
+| Spectrum bounds (eV)          | \(\omega_{min}\), \(\omega_{max}\), bounds of the spectral range of interest                                          | 2.0, 4.5      |
+| Metal type                    | Material of the shell (e.g., `silver`)                                                                                | silver        |
+| Metal model                   | Model for the metal (`drude`, `spline`)                                                                               | drude         |
+| Gain medium model             | Model for the active core medium (`lorentz`, `flat`)                                                                  | lorentz       |
+| Host material                 | Surrounding medium (e.g., `water`)                                                                                    | water         |
+| Excitation field amplitude    | \(E_0\), excitation field (arbitrary units); compare with saturation field amplitude \(E_{sat}\) (see Esat.cxx in src)| 1.e-30        |
+| Radius ratio                  | \(\rho\), ratio of inner to outer radius                                                                              | 0.6           |
+| Core material                 | Material of the nanoshell core (e.g., `silica`)                                                                       | silica        |
 
 ### 2. `data/input/time.dat`
 This file specifies time-dependent simulation parameters:
