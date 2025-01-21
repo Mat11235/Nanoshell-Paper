@@ -1,0 +1,4 @@
+# Ignore all output files
+data/output/*
+# Ignore metadata file
+.conversion_metadata
