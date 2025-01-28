@@ -74,7 +74,6 @@ int main(int argc, char** argv) {
     cout << "  Metal model: " << mdl << "\n";
     cout << "  Metal type: " << mtl << "\n";
     cout << "  Core material: " << hst << "\n";
-    cout << "  Spectral range: [" << omemi << ", " << omema << "] eV\n";
     cout << "  Solvent: " << sol << "\n";
     cout << "  Radius ratio: " << rho << "\n\n";
 
@@ -89,10 +88,12 @@ int main(int argc, char** argv) {
     ofstream output("results/time_behavior.log");
     if (output.is_open()) {
         output << "Steady-state polarizability calculation results:\n";
-        output << "  Metal model: " << mdl << "\n";
+	output << "  Frequency: " << omeeV << " eV\n";
+	output << "  Metal model: " << mdl << "\n";
         output << "  Metal type: " << mtl << "\n";
         output << "  Core material: " << hst << "\n";
-        output << "  Spectral range: [" << omemi << ", " << omema << "] eV\n";
+        output << "  Time range: [0, " << T << "] ps\n";
+        output << "  The pump is switched on at "<<tpump<<" ps\n";
         output << "  Solvent: " << sol << "\n";
         output << "  Radius ratio: " << rho << "\n";
         output << "\nCheck simulation output for detailed results.\n";
