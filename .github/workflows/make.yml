@@ -12,6 +12,9 @@ jobs:
       - name: Install dependencies
         run: sudo apt-get update && sudo apt-get install -y libgsl-dev libarmadillo-dev gfortran
 
+      - name: Grant execute permissions to configure
+        run: chmod +x configure
+
       - name: Run configure
         run: ./configure
 
