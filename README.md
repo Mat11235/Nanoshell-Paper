@@ -145,3 +145,4 @@ Contributions are welcome! If you find any bugs or have feature requests, feel f
 ## Contact
 
 For questions or collaboration opportunities, please reach out to Alessandro Veltri at alessandro.veltri@gmail.com.
+# Tiny sync fix
