@@ -1,4 +1,10 @@
-# Ignore all output files
+# Ignore everything inside data/output and img
 data/output/*
+img/*
+
+# But track the directories themselves
+!data/output/.gitkeep
+!img/.gitkeep
+
 # Ignore metadata file
 .conversion_metadata
