@@ -40,8 +40,7 @@ int main(int argc, char** argv){
 	}
   ome=atof(argv[1]);
   lam=h*j2eV*c/(ome*1.e-9);
-//   ome=h*j2eV*c/(lam*1.e-9);
-//cout<<6.626068e-34*299792458*6.24150636309e18*1.e9<<endl;
+
   cout<<lam<<endl;
   return 0;
   } 
