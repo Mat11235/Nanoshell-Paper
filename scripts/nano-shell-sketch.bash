@@ -76,7 +76,7 @@ convert second_spot.png '(' second_spot.png -blur 0x$second_spot_blur_radius -fu
 composite -gravity center output2.png output1.png output0.png
 convert output0.png '(' inner_circle.png  -fuzz 20% ')' -channel Alpha -evaluate Multiply .5 -composite output.png
 composite second_spot.png output.png ultima.png
-composite -gravity center ultima.png flare.png ../img/nanoshell.png
+composite -gravity center ultima.png ../img/input/flare.png ../img/nanoshell.png
 
 # Cleanup temporary files
  rm outer_circle.png inner_circle.png second_spot.png output2.png output1.png output0.png ultima.png output.png
