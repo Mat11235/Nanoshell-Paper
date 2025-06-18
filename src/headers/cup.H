@@ -267,16 +267,14 @@ class nanosphere{
 
 	std::complex<double> active(double ome, double epsh){
 	  std::complex<double> eps, epsH;
+	  double nG=-fabs(G);
 	  if (act!=66.){
 		  epsH = std::complex<double> (epsh,0.);
-	      eps=epsH-act*G*Dome/(2.*(ome-ome_0)+img*Dome)+(1-act)*G*img;
+	      eps=epsH-act*nG*Dome/(2.*(ome-ome_0)+img*Dome)+(1-act)*nG*img;
 	      } else {
 		eps.real(epsh+enha*gsl_spline_eval (reeph, ome, ach));
 		eps.imag(enha*gsl_spline_eval (imeph, ome, ach));
 		}
-	  kap =-.5*imag(eps)/(sqrt(real(eps)));//1/sqrt(2) // sqrt(.5*(-real(eps)+abs(eps)));
-	  gamd = 4.*pi*kap*ome/(j2eV*h*cc);
-	  enne = gamd/(.95*8.e-20);//.95 quantum yeld 8.e-20 cross section
 	  return eps;
 	  }
 	  
@@ -322,7 +320,7 @@ class nanosphere{
 	ome_sp = d;   // spasing freq
 	}
 	ome_sp   = ome_sp;
-	Gth = Dome*imag(F_D)/Dome;
+	Gth = -Dome*imag(F_D)/Dome;
 	
 	reso[0]=ome_sp;
 	reso[1]=Gth;
