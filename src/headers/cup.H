@@ -55,18 +55,20 @@ class nanosphere{
 	gsl_spline *imeps;
 	gsl_spline *reeph;
 	gsl_spline *imeph;
+	double *omem;
+	int rows, spln;
 	char *wrk;
     public:
 	std::complex<double> img;
-	double lrntz, act;
+	double act;
 	double pi, vF, enha;
 	double A, r1, r2, rap;
 	double G, nOme;
-	double ome_p, ome_L, tau_d, tau_L, Dome, lam_0, eps_0;
-	double ome_p2,ome_L2, tau_d2, tau_L2, ome_0, gamd, kap;
+	double ome_p, Dome, lam_0, eps_0;
+	double ome_p2, ome_0, gamd, kap;
 	double ome_o2, ome, f, n, enne, omeB;
 	double Ome_p, Gam_d, Gam, eps_inf, Ome_L, Gam_L, Deps, DELTAOme;
-	std::complex<double> eps3;
+	std::complex<double> eps3, ceps_inf;
 	void init(){
 	  /** all values are in MKS **/
 	  img = std::complex<double> (0., 1.);
@@ -75,107 +77,108 @@ class nanosphere{
 
 	void set_metal(const char* mtl, const char* mdl, int sel=0){
 	  /** Ome_p [THz]	Plasma frequency (gold)		**/
-	  /** Ome_L [THz]	Lorentz frequency (gold)	**/
 	  /** Gam_d [THz]	Drude damping coefficient (gold)**/
-	  /** Gam_L [THz]	Lorentz spectral width (gold)	**/
-	  /** Deps weighting factor.			**/
-	  double *omem, *reps, *ieps, la, Dr, Di, lc;
-	  char line [900], *jc;
-	  int rows=0;
+	  double *reps, *ieps, la, Dr, Di;
+	  char *jc;
+	  rows=0;
 	  jc = new char [35];
 	  if(strcmp(mtl,"gold")==0){
-	      vF=1.39e6;
-	      /** m/s **/
-// 	      lc=5e-9; // va bene per lo spettro
-// 	      lc=1.5e-8; // va bene per le misure sul setup senza pompa
-	      lc=1.e-8; // va bene per le misure sul setup
-// 	      Gam=h*j2eV*vF/(r1*2.*pi);
-	      Gam=h*j2eV*vF/(lc*2.*pi);
-// 	      std::cout<<r1<<" Gam = "<<Gam<<std::endl;
 	      Ome_p=8.91;
 	      Gam_d=0.0759;
-// 	      std::cout<<"Gam_d = "<<Gam_d<<std::endl;
 	      eps_inf=9.0685;
 	      if(strcmp(mdl,"drude")==0){
-		lrntz=0;
-		} else if(strcmp(mdl,"drude-lorentz")==0){
-		  if (sel==1){
-		    Ome_p=8.91;//2113.6;
-		    Gam_d=0.0759;//15.92;
-		    eps_inf=5.9673;
-		    Deps=1.09;
-		    Ome_L=1.90724;//wait!!
-		    Gam_L=11.8238;//wait!!
-		    }
-		  else if (sel==2){
-		    Ome_p=2106.78;
-		    Gam_d=2.46;
-		    eps_inf=6.617;
-		    Deps=1.73;
-		    Ome_L=730.56;
-		    Gam_L=222.0;
-		}else exit(1);
-		lrntz=1;
-	      } else if(strcmp(mdl,"spline")==0){
-		if (sel==1) strcpy(jc,"../data/input/goldJCeV.dat");
-		else if (sel==2) strcpy(jc,"../data/input/goldWeV.dat");
-		else exit(-1);
-		std::fstream inp;
-		inp.open(jc,std::ios::in);
-		while(!inp.eof()){
-		  inp.getline (line,900);
-		  rows++;
-		  }
-		inp.close();
-		omem=new double [rows];
-		reps=new double [rows];
-		ieps=new double [rows];
-		inp.open(jc, std::ios::in);
-		for (int i=0; i<rows; i++)
-		  inp>>la>>omem[i]>>reps[i]>>ieps[i]>>Dr>>Di;
-		acc = gsl_interp_accel_alloc ();
-		reeps = gsl_spline_alloc (gsl_interp_cspline, rows);
-		imeps = gsl_spline_alloc (gsl_interp_cspline, rows);
-		gsl_spline_init (reeps, omem, reps, rows);
-		gsl_spline_init (imeps, omem, ieps, rows);
-		lrntz=-1;
+		} else if(strcmp(mdl,"spline")==0){
+		spln = 1;
+		strcpy(jc,"../data/input/goldJCeV.dat");
+			std::ifstream inp(jc);
+			if (!inp) {
+				std::cerr << "Error: could not open " << jc << "\n";
+				exit(1);
+			}
+
+			std::vector<double> omem_vec, reps_vec, ieps_vec;
+			double om, re, im;
+
+			std::string line;
+			while (std::getline(inp, line)) {
+				std::istringstream iss(line);
+				if (iss >> la >> om >> re >> im >> Dr >> Di) {
+					omem_vec.push_back(om);
+					reps_vec.push_back(re);
+					ieps_vec.push_back(im);
+				}
+			}
+
+			inp.close();
+
+			rows = omem_vec.size();
+			omem = new double[rows];
+			reps = new double[rows];
+			ieps = new double[rows];
+
+			for (int i = 0; i < rows; ++i) {
+				omem[i] = omem_vec[i];
+				reps[i] = reps_vec[i];
+				ieps[i] = ieps_vec[i];
+			}
+
+			acc   = gsl_interp_accel_alloc();
+			reeps = gsl_spline_alloc(gsl_interp_cspline, rows);
+			imeps = gsl_spline_alloc(gsl_interp_cspline, rows);
+
+			gsl_spline_init(reeps, omem, reps, rows);
+			gsl_spline_init(imeps, omem, ieps, rows);
 		}
 	      else {
 		std::cout<<"you chosed "<<mdl<<" while option for gold are: drude, drude-lorentz, spline"<<std::endl;
 		exit(1);
 		}
 	    } else  if(strcmp(mtl,"silver")==0){
-	      vF=1.39e6;
-	      /** m/s **/
-	      lc=1.e-8; // 
-	      Gam=h*j2eV*vF/(lc*2.*pi);
 	      Ome_p=9.6;
 	      Gam_d=0.0228;
 	      eps_inf=5.3;
 		if(strcmp(mdl,"drude")==0){
-		lrntz=0;
-		} else if(strcmp(mdl,"spline")==0){
-		strcpy(jc,"../data/input/silverJCeV.dat");
-		std::fstream inp;
-		inp.open(jc,std::ios::in);
-		while(!inp.eof()){
-		  inp.getline (line,900);
-		  rows++;
-		  }
-		inp.close();
-		omem=new double [rows];
-		reps=new double [rows];
-		ieps=new double [rows];
+		} else if (strcmp(mdl, "spline") == 0) {
+		    spln = 1;
+			strcpy(jc, "../data/input/silverJCeV.dat");
+			std::ifstream inp(jc);
+			if (!inp) {
+				std::cerr << "Error: could not open " << jc << "\n";
+				exit(1);
+			}
 
-		inp.open(jc, std::ios::in);
-		for (int i=0; i<rows; i++)
-		  inp>>la>>omem[i]>>reps[i]>>ieps[i]>>Dr>>Di;
-		acc = gsl_interp_accel_alloc ();
-		reeps = gsl_spline_alloc (gsl_interp_cspline, rows);
-		imeps = gsl_spline_alloc (gsl_interp_cspline, rows);
-		gsl_spline_init (reeps, omem, reps, rows);
-		gsl_spline_init (imeps, omem, ieps, rows);
-		lrntz=-1;
+			std::vector<double> omem_vec, reps_vec, ieps_vec;
+			double la, Dr, Di, om, re, im;
+
+			std::string line;
+			while (std::getline(inp, line)) {
+				std::istringstream iss(line);
+				if (iss >> la >> om >> re >> im >> Dr >> Di) {
+					omem_vec.push_back(om);
+					reps_vec.push_back(re);
+					ieps_vec.push_back(im);
+				}
+			}
+
+			inp.close();
+
+			rows = omem_vec.size();
+			omem = new double[rows];
+			reps = new double[rows];
+			ieps = new double[rows];
+
+			for (int i = 0; i < rows; ++i) {
+				omem[i] = omem_vec[i];
+				reps[i] = reps_vec[i];
+				ieps[i] = ieps_vec[i];
+			}
+
+			acc   = gsl_interp_accel_alloc();
+			reeps = gsl_spline_alloc(gsl_interp_cspline, rows);
+			imeps = gsl_spline_alloc(gsl_interp_cspline, rows);
+
+			gsl_spline_init(reeps, omem, reps, rows);
+			gsl_spline_init(imeps, omem, ieps, rows);
 		}
 	      else {
 		std::cout<<"you chosed "<<mdl<<" while option for silver are: spline"<<std::endl;
@@ -187,12 +190,7 @@ class nanosphere{
 		exit(1);
 		}
 	  ome_p=Ome_p; //corretto
-	  ome_L=Ome_L*1.e12;
-	  tau_d=1./(Gam_d*1.e12);
-	  tau_L=1./(Gam_L*1e12);
 	  ome_p2=ome_p*ome_p;
-	  ome_L2=ome_L*ome_L;
-	  ome_o2=ome_0*ome_0;
 	  }
 
 	double set_host(const char* hst){
@@ -219,14 +217,30 @@ class nanosphere{
 	      }
 	  }
 
-	std::complex<double> metal(double ome){
-	  std::complex<double> eps;
-	  if (lrntz == -1){
-	     eps.real(gsl_spline_eval (reeps, ome, acc));
-	     eps.imag(gsl_spline_eval (imeps, ome, acc));
-	    } else eps= eps_inf - ome_p2/(ome*(ome+img*Gam_d));// - lrntz*Deps*ome_L2/((ome*ome-ome_L2)+img*ome/tau_L);
-	  return eps;
-	  }
+std::complex<double> metal(double ome) {
+    std::complex<double> eps;
+
+    if (spln == 1) {
+        double x_min = omem[0];
+        double x_max = omem[rows - 1];
+
+        if (std::real(ome) < x_min || std::real(ome) > x_max) {
+            std::cerr << "⚠️ GSL interpolation error: omega = " << std::real(ome)
+                      << " is outside the interpolation range [" << x_min << ", " << x_max << "]\n";
+            std::cerr << "Aborting safely to avoid crash.\n";
+            std::exit(EXIT_FAILURE);
+        }
+
+        eps.real(gsl_spline_eval(reeps, ome, acc));
+        eps.imag(gsl_spline_eval(imeps, ome, acc));
+    } else {
+        eps = eps_inf - ome_p2 / (ome * (ome + img * Gam_d));
+    }
+
+    ceps_inf = eps + ome_p2 / (ome * (ome + img * Gam_d));
+    return eps;
+}
+
 	  
 	std::complex<double> confinement(double ome){
 	  std::complex<double> dlt;
@@ -351,8 +365,8 @@ class nanosphere{
 
 	    std::vector<std::pair<double,std::complex<double>>> valph;
 	    
-	    double tau2, gamd, ome0, eps3, pG = fabs(G), *p0, *p1, *p2, *nv;
-	    std::complex<double> GG, OmeH, GamP, OmeP, **A, detA, *kap, *odv;
+	    double tau2, gamd, ome0, eps3, pG = fabs(G), *nv;
+	    std::complex<double> GG, OmeH, GamP, OmeP, **A, detA, *p0, *p1, *p2, *kap, *odv;
 	    
 	    A = new std::complex<double>*[3];
 	    for(int i = 0; i <= 2; i++)
@@ -437,9 +451,9 @@ class nanosphere{
 		    "\t"<<std::setw(11)<<std::setiosflags (std::ios::left)<<imag(eps2)<< // 5 Im(eps2)
 		    std::endl;
 
-		p0 = pcfc0(eps_inf, eps_b, eps_s, rho);
-		p1 = pcfc1(eps_inf, eps_b, eps_s, rho);
-		p2 = pcfc2(eps_inf, eps_b, eps_s, rho);
+		p0 = pcfc0(ceps_inf, eps_b, eps_s, rho);
+		p1 = pcfc1(ceps_inf, eps_b, eps_s, rho);
+		p2 = pcfc2(ceps_inf, eps_b, eps_s, rho);
 		
 		ome = omeeV/Ome_p;
 		
@@ -528,8 +542,8 @@ class nanosphere{
 		eps_b=set_host(hst);
 		int steste=0;
 		std::complex<double> eps1e, eps2e, eps1, eps2, alph;
-		double omep, t, tau1, tau2, gamd, ome0, pG = fabs(G), *p0, *p1, *p2, *p3, *p, *nv, tildeN;
-		std::complex<double> GG, OmeH, chiH, GamP, OmeP, chiP, **A, *B, dip, po, *odv;
+		double omep, t, tau1, tau2, gamd, ome0, pG = fabs(G), *nv, tildeN;
+		std::complex<double> GG, OmeH, chiH, GamP, OmeP, chiP, **A, *B, *p0, *p1, *p2, *p3, *p, dip, po, *odv;
 
 		double dpTOT=0, t0;
 		double omeR;
@@ -545,11 +559,6 @@ class nanosphere{
 		nv = new double[4];
 
 		odv = new std::complex<double> [3];
-		
-		p0 = new double[3];
-		p1 = new double[3];
-		p2 = new double[3];
-		p3 = new double[3];
 		
 		if (T==0){ 
 		    T=100000;
@@ -584,23 +593,20 @@ class nanosphere{
 		fnct<<"# t (ps)\treal(q0)\timag(q0)\treal(q1)\timag(q1)\treal(q2)\timag(q2)"<<std::endl;
 		fnct<<"#"<<std::endl;
 
-		omep = eV2j*Ome_p*2.*M_PI/h;// omep = eV2j*Ome_p/h;  //converto in Hz
+		omep = eV2j*Ome_p*2.*M_PI/h;
 		// normalized variables
 		nv = normalized_variables ();
 		tau1 = nv[0];
 		tau2 = nv[1];
 		gamd = nv[2];
 		ome0 = nv[3];
-// 		std::cout<<"tau1 = "<<tau1/omep*1.e+12<<" ps"<<std::endl;
-// 		exit(0);
 		GG = set_GG(G, tau2);
-// 		std::cout<<"|Esat|² = 1./("<<fabs(G)<<"*"<<tau1<<") = "<<1./(fabs(G)*tau1)<<std::endl;
-// 		std::cout<<" ../bin/Esat   = "<<sqrt(1./(fabs(G)*tau1))<<std::endl;
+
 		
-		p0 = pcfc0(eps_inf, eps_b, eps_s, rho);
-		p1 = pcfc1(eps_inf, eps_b, eps_s, rho);
-		p2 = pcfc2(eps_inf, eps_b, eps_s, rho);
-		p3 = pcfc3(eps_inf, eps_b, eps_s, rho);
+		p0 = pcfc0(ceps_inf, eps_b, eps_s, rho);
+		p1 = pcfc1(ceps_inf, eps_b, eps_s, rho);
+		p2 = pcfc2(ceps_inf, eps_b, eps_s, rho);
+		p3 = pcfc3(ceps_inf, eps_b, eps_s, rho);
 		if (ns == 1) p=p3;
 		    else p=p0;
 
@@ -726,8 +732,8 @@ class nanosphere{
 		eps_b=set_host(hst);
 		int steste=0, amp=0;
 		std::complex<double> eps1e, eps2e, eps1, eps2, alph;
-		double omep, t, tau1, tau2, gamd, ome0, pG = fabs(G), *p0, *p1, *p2, *p3, *p, *nv, N, tildeN;
-		std::complex<double> GG, OmeH, chiH, GamP, OmeP, chiP, **A, *B, dip, *odv;
+		double omep, t, tau1, tau2, gamd, ome0, pG = fabs(G), *nv, N, tildeN;
+		std::complex<double> GG, OmeH, chiH, GamP, OmeP, chiP, **A, *B, *p0, *p1, *p2, *p3, *p, dip, *odv;
 				
 		A = new std::complex<double>*[3];
 		for(int i = 0; i <= 2; i++)
@@ -781,10 +787,10 @@ class nanosphere{
 		ome0 = nv[3];
 		GG = set_GG(G, tau2);
 
-		p0 = pcfc0(eps_inf, eps_b, eps_s, rho);
-		p1 = pcfc1(eps_inf, eps_b, eps_s, rho);
-		p2 = pcfc2(eps_inf, eps_b, eps_s, rho);
-		p3 = pcfc3(eps_inf, eps_b, eps_s, rho);
+		p0 = pcfc0(ceps_inf, eps_b, eps_s, rho);
+		p1 = pcfc1(ceps_inf, eps_b, eps_s, rho);
+		p2 = pcfc2(ceps_inf, eps_b, eps_s, rho);
+		p3 = pcfc3(ceps_inf, eps_b, eps_s, rho);
 		if ((sol != NULL)) p=p3;
 		    else p=p0;
 		ome = omeeV/Ome_p;

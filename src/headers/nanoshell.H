@@ -17,55 +17,51 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-double* pcfc0(double eps_inf, double eps_b, double eps_s, double rho){
-      double* p = 0;
-      p = new double[4];
+inline std::complex<double>* pcfc0(std::complex <double> eps_inf, double eps_b, double eps_s, double rho){
+      auto* p = new std::complex<double>[4];
       double r3=rho*rho*rho;
-      double D1=(eps_inf+2*eps_s)*(eps_b+2*eps_inf)+2*r3*(eps_b-eps_inf)*(eps_inf-eps_s);
+      std::complex<double> D1=(eps_inf+2*eps_s)*(eps_b+2.*eps_inf)+2*r3*(eps_b-eps_inf)*(eps_inf-eps_s);
       p[0] = -(eps_inf+2*eps_s+2*r3*(eps_inf-eps_s))/D1;
-      p[1] = -2*(1-r3)*(eps_inf-eps_s)/D1;
-      p[2] = -2*(1-r3)*(eps_inf+2*eps_s)/D1;
-      p[3] = -9*eps_s*eps_inf/D1;
+      p[1] = -2.*(1-r3)*(eps_inf-eps_s)/D1;
+      p[2] = -2.*(1-r3)*(eps_inf+2*eps_s)/D1;
+      p[3] = -9.*eps_s*eps_inf/D1;
       return p;
     }
 
-double* pcfc1(double eps_inf, double eps_b, double eps_s, double rho){
-      double* p = 0;
-      p = new double[4];
+inline std::complex<double>* pcfc1(std::complex <double> eps_inf, double eps_b, double eps_s, double rho){
+      auto* p = new std::complex<double>[4];
       double r3=rho*rho*rho;
-      double D1=(eps_inf+2*eps_s)*(eps_b+2*eps_inf)+2*r3*(eps_b-eps_inf)*(eps_inf-eps_s);
-      p[0] = 2*r3*(eps_s-eps_inf)/D1;
-      p[1] = -(r3*(eps_b+2*eps_s)+(1-r3)*(eps_b+2*eps_inf))/D1;
-      p[2] = 2*r3*(eps_b+2*eps_s)/D1;
-      p[3] = -3*eps_s*(eps_b+2*eps_inf)/D1;
+      std::complex<double> D1=(eps_inf+2*eps_s)*(eps_b+2.*eps_inf)+2*r3*(eps_b-eps_inf)*(eps_inf-eps_s);
+      p[0] = 2.*r3*(eps_s-eps_inf)/D1;
+      p[1] = -(r3*(eps_b+2*eps_s)+(1-r3)*(eps_b+2.*eps_inf))/D1;
+      p[2] = 2.*r3*(eps_b+2*eps_s)/D1;
+      p[3] = -3.*eps_s*(eps_b+2.*eps_inf)/D1;
       return p;
     }
 
-double* pcfc2(double eps_inf, double eps_b, double eps_s, double rho){
-      double* p = 0;
-      p = new double[4];
+inline std::complex<double>* pcfc2(std::complex <double> eps_inf, double eps_b, double eps_s, double rho){
+      auto* p = new std::complex<double>[4];
       double r3=rho*rho*rho;
-      double D1=(eps_inf+2*eps_s)*(eps_b+2*eps_inf)+2*r3*(eps_b-eps_inf)*(eps_inf-eps_s);
-      p[0] = -(eps_inf+2*eps_s)/D1;
-      p[1] = (eps_b+2*eps_s)/D1;
-      p[2] = -2*(eps_inf+2*eps_s+r3*(eps_b-eps_inf))/D1;
-      p[3] = 3*eps_s*(eps_b-eps_inf)/D1;
+      std::complex<double> D1=(eps_inf+2*eps_s)*(eps_b+2.*eps_inf)+2.*r3*(eps_b-eps_inf)*(eps_inf-eps_s);
+      p[0] = -(eps_inf+2.*eps_s)/D1;
+      p[1] = (eps_b+2.*eps_s)/D1;
+      p[2] = -2.*(eps_inf+2*eps_s+r3*(eps_b-eps_inf))/D1;
+      p[3] = 3.*eps_s*(eps_b-eps_inf)/D1;
       return p;
     }
 
-double* pcfc3(double eps_inf, double eps_b, double eps_s, double rho){
-      double* p = 0;
-      p = new double[4];
+inline std::complex<double>* pcfc3(std::complex <double> eps_inf, double eps_b, double eps_s, double rho){
+      auto* p = new std::complex<double>[4];
       double r3=rho*rho*rho;
-      double D1=(eps_inf+2*eps_s)*(eps_b+2*eps_inf)+2*r3*(eps_b-eps_inf)*(eps_inf-eps_s);
-      p[0] = -3*r3*eps_inf/D1;
-      p[1] = -(1-r3)*(eps_b+2*eps_inf)/D1;
-      p[2] = 2*r3*(1-r3)*(eps_b-eps_inf)/D1;
-      p[3] = ((eps_inf-eps_s)*(eps_b+2*eps_inf)+r3*(eps_b-eps_inf)*(eps_s+2*eps_inf))/D1;
+      std::complex<double> D1=(eps_inf+2.*eps_s)*(eps_b+2.*eps_inf)+2.*r3*(eps_b-eps_inf)*(eps_inf-eps_s);
+      p[0] = -3.*r3*eps_inf/D1;
+      p[1] = -(1-r3)*(eps_b+2.*eps_inf)/D1;
+      p[2] = 2.*r3*(1-r3)*(eps_b-eps_inf)/D1;
+      p[3] = ((eps_inf-eps_s)*(eps_b+2.*eps_inf)+r3*(eps_b-eps_inf)*(eps_s+2.*eps_inf))/D1;
       return p;
     }
     
-std::complex<double>** coefficients(std::complex<double> OmeH, std::complex<double> OmeP, std::complex<double> GG, std::complex<double> GamP, double* p0, double* p1, double* p2, int J=0){
+std::complex<double>** coefficients(std::complex<double> OmeH, std::complex<double> OmeP, std::complex<double> GG, std::complex<double> GamP, std::complex<double>* p0, std::complex<double>* p1 = nullptr, std::complex<double>* p2 = nullptr, int J=0){
       std::complex<double>** A = 0;
       A = new std::complex<double>*[3];
       for (int j = 0; j <= 2; j++)  A[j] = new std::complex<double>[3];
@@ -84,7 +80,7 @@ std::complex<double>** coefficients(std::complex<double> OmeH, std::complex<doub
       return A;
     }
 
-std::complex<double>* inhomogeneous(std::complex<double> GG, std::complex<double> GamP, double E0, double* p0, double* p1, double* p2){
+std::complex<double>* inhomogeneous(std::complex<double> GG, std::complex<double> GamP, double E0, std::complex<double>* p0, std::complex<double>* p1 = nullptr, std::complex<double>* p2 = nullptr){
       std::complex<double>* B = 0;
       B = new std::complex<double>[3];
       B[0] = GG*p0[3]*E0;
@@ -118,7 +114,7 @@ std::complex<double> polarizability(std::complex<double> eps1, std::complex<doub
     return alph;
     }
 
-std::complex<double> numerical_output(double E0, std::complex<double> *q, double* p){
+std::complex<double> numerical_output(double E0, std::complex<double> *q, std::complex<double>* p){
   std::complex<double> nout;
   nout = p[0]*q[0] + p[1]*q[1] + p[2]*q[2] + p[3]*E0;
   return nout;

@@ -47,7 +47,7 @@ set style fill transparent solid 0.4
 power=-3
 div=10**power
 
-set xrange [0:800]
+# set xrange [0:800]
 set key left
 
 
