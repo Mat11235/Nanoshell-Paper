@@ -1,10 +1,12 @@
 # Ignore everything inside data/output and img
 data/output/*
 img/*
+bin/*
 
 # But track the directories themselves
 !data/output/.gitkeep
 !img/.gitkeep
+!bin/.gitkeep
 
 # Ignore metadata file
 .conversion_metadata
