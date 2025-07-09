@@ -211,40 +211,10 @@ class nanosphere{
 	  }
 	  
 	void set_active(const char* mod){
-	  char line [900], *mc;
-	  double *omem, *reph, *ieph;
-	  int rows=0;
-	  mc = new char [25];
 	  if(strcmp(mod,"lorentz")==0) act=1.;
 	    else if(strcmp(mod,"flat")==0) act=0.;
-	    else if(strcmp(mod,"interpole")==0){
-		std::fstream inp;
-		strcpy(mc,"../data/input/mc.dat");
-		inp.open("../data/input/mc.dat",std::ios::in);
-		while(!inp.eof()){
-		  inp.getline (line,900);
-		  rows++;
-		  }
-		rows--;
-		inp.close();
-		omem=new double [rows];
-		reph=new double [rows];
-		ieph=new double [rows];
-		inp.open("../data/input/mc.dat", std::ios::in);
-		for (int i=0; i<rows; i++){
-		  inp>>omem[i]>>reph[i]>>ieph[i];
-		  reph[i]=reph[i]-2.220;
-		  ieph[i]=ieph[i]+0.12;
-		  }
-		ach = gsl_interp_accel_alloc ();
-		reeph = gsl_spline_alloc (gsl_interp_cspline, rows);
-		imeph = gsl_spline_alloc (gsl_interp_cspline, rows);
-		gsl_spline_init (reeph, omem, reph, rows);
-		gsl_spline_init (imeph, omem, ieph, rows);
-		act=66.;
-	      }
 	    else{
-	      std::cout<<"option are: flat, lorentz, interpole"<<std::endl;
+	      std::cout<<"option are: flat, lorentz"<<std::endl;
 	      exit(1);
 	      }
 	  }
@@ -266,17 +236,11 @@ class nanosphere{
 
 
 	std::complex<double> active(double ome, double epsh){
-	  std::complex<double> eps, epsH;
-	  double nG=-fabs(G);
-	  if (act!=66.){
-		  epsH = std::complex<double> (epsh,0.);
-	      eps=epsH-act*nG*Dome/(2.*(ome-ome_0)+img*Dome)+(1-act)*nG*img;
-	      } else {
-		eps.real(epsh+enha*gsl_spline_eval (reeph, ome, ach));
-		eps.imag(enha*gsl_spline_eval (imeph, ome, ach));
-		}
-	  return eps;
-	  }
+	  std::complex<double> eps;
+      double nG = fabs(G);
+      eps = std::complex<double>(epsh, 0.) + act*nG*Dome/(2.*(ome - ome_0) + img*Dome) - (1 - act)*nG*img;
+      return eps;
+    }
 	  
 
     double *frohlich(double a0, double b0, double eps_b, double eps_s=0, double rap=0){
