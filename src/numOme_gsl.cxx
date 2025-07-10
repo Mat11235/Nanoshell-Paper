@@ -44,6 +44,10 @@ double nfindOme(int nfft, vector<complex<double>> wave, double dt){
     wavetable = gsl_fft_complex_wavetable_alloc (nfft);
     workspace = gsl_fft_complex_workspace_alloc (nfft);
     ofstream  wve("../data/output/wave.dat");
+    if (!wve) {
+        cerr << "Error: Cannot open output file" << endl;
+        return 1;
+    }
     
     for (int i=0; i<nfft; i++) {
         REAL(data,i) = wave[i].real();
