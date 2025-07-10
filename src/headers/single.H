@@ -1,5 +1,5 @@
 /*
- * This file is part of the Nano-Shell Simulation Project.
+ * This file is part of the Quasi-Static Time-Dynamic Project.
  * 
  * Copyright (C) 2025 Alessandro Veltri
  *
@@ -17,9 +17,8 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-double* pcfc0(double eps_inf, double eps_b, double eps_s=0, double rho=0){
-      double* p = 0;
-      p = new double[4];
+inline std::complex<double>* pcfc0(std::complex <double> eps_inf, double eps_b, double eps_s=0, double rho=0){
+      auto* p = new std::complex<double>[4];
       p[0] = -1./(eps_inf+2.*eps_b);
       p[1] = 2.*p[0];
       p[2] = p[0];
@@ -27,24 +26,24 @@ double* pcfc0(double eps_inf, double eps_b, double eps_s=0, double rho=0){
       return p;
     }
 
-double* pcfc1(double eps_inf, double eps_b, double eps_s=0, double rho=0){
-      double* p = 0;
+inline std::complex<double>* pcfc1(std::complex <double> eps_inf, double eps_b, double eps_s=0, double rho=0){
+      std::complex<double>* p = nullptr;
       return p;
     }
 
-double* pcfc2(double eps_inf, double eps_b, double eps_s=0, double rho=0){
-      double* p = 0;
+inline std::complex<double>* pcfc2(std::complex <double> eps_inf, double eps_b, double eps_s=0, double rho=0){
+      std::complex<double>* p = nullptr;
       return p;
     }
     
-double* pcfc3(double eps_inf, double eps_b, double eps_s=0, double rho=0){
-      double* p = 0;
+inline std::complex<double>* pcfc3(std::complex <double> eps_inf, double eps_b, double eps_s=0, double rho=0){
+      std::complex<double>* p = nullptr;
       return p;
     }
 
     
-std::complex<double>** coefficients(std::complex<double> OmeH, std::complex<double> OmeP, std::complex<double> GG, std::complex<double> GamP, double* p0, double* p1 = 0, double* p2 = 0, int J=0){
-      std::complex<double>** A = 0;
+std::complex<double>** coefficients(std::complex<double> OmeH, std::complex<double> OmeP, std::complex<double> GG, std::complex<double> GamP, std::complex<double>* p0, std::complex<double>* p1 = nullptr, std::complex<double>* p2 = nullptr, int J=0){
+      std::complex<double>** A = nullptr;
       A = new std::complex<double>*[3];
       for (int j = 0; j <= 2; j++)  A[j] = new std::complex<double>[3];
 
@@ -63,7 +62,7 @@ std::complex<double>** coefficients(std::complex<double> OmeH, std::complex<doub
       return A;
     }
 
-std::complex<double>* inhomogeneous(std::complex<double> GG, std::complex<double> GamP, double E0, double* p0, double* p1 = 0, double* p2 = 0){
+std::complex<double>* inhomogeneous(std::complex<double> GG, std::complex<double> GamP, double E0, std::complex<double>* p0, std::complex<double>* p1 = nullptr, std::complex<double>* p2 = nullptr){
       std::complex<double>* B = 0;
       B = new std::complex<double>[3];
       B[0] = GG*E0;
@@ -89,7 +88,7 @@ std::complex<double> polarizability(std::complex<double> eps1, std::complex<doub
     return alph;
     }
 
-std::complex<double> numerical_output(double E0, std::complex<double> *q, double* p){
+std::complex<double> numerical_output(double E0, std::complex<double> *q, std::complex<double>* p ){
   std::complex<double> nout;
   nout = p[0]*q[0] + p[1]*q[1] + p[2]*q[2] + p[3]*E0;  
   return nout;
