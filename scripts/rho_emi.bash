@@ -38,7 +38,7 @@ for rho in 0.4 0.5 0.6 0.7 0.8; do
     ./../bin/oap
     cp "../data/output/oGp/ome_p3.dat" "../data/output/rho/$rho.dat"
     echo $omeG > "../data/output/rho/omeB-$rho.dat"
-    bash nano-shell-sketch_no-flare.bash $rho
+    bash nano-shell-sketch_no-flare-homo.bash $rho
     mv "../img/nanoshell.png" "../data/output/rho/$rho.png"
 done
 

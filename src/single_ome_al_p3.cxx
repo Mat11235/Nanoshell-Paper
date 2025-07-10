@@ -158,8 +158,11 @@ int main(){
     nanosphere ns;
     ns.init();
     
-    fstream nano;
-    nano.open("../data/input/nanosphere_eV.dat", ios::in);
+    ifstream nano("../data/input/nanosphere_eV.dat");
+    if (!nano) {
+        cerr << "Error: Cannot open input file" << endl;
+        return 1;
+    }
 
     nano>>ns.r1>>ns.Dome>>ns.ome_0>>ns.G>>omemi>>omema>>mtl>>mdl>>active>>sol>>E0;
     
@@ -196,9 +199,21 @@ int main(){
         ome2 = (rzero.second < izero.second) ? rzero.second : izero.second;
         }
 
-    fstream cop3, coal, cext;
-    coal.open("../data/output/oGp/ome_al.dat", ios::out);
-    cext.open("../data/output/oGp/ome_ex.dat", ios::out);
+    ofstream cop3("../data/output/oGp/ome_p3.dat");
+    if (!cop3) {
+        cerr << "Error: Cannot open output file" << endl;
+        return 1;
+    }
+    ofstream coal("../data/output/oGp/ome_al.dat");
+    if (!coal) {
+        cerr << "Error: Cannot open output file" << endl;
+        return 1;
+    }
+    ofstream cext("../data/output/oGp/ome_ex.dat");
+    if (!cext) {
+        cerr << "Error: Cannot open output file" << endl;
+        return 1;
+    }
 
 
     cext<<ome1<<" "<<ome2<<" "<<fro[0]<<" "<<kex1<<" "<<kex2<<endl;
