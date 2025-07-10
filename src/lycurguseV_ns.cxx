@@ -40,13 +40,23 @@ int main(){
   char mtl[16], mdl[16], hst[16], active[16], sol[16];
   complex<double> eps, eps1, eps2, eps3, alph;
 
-  fstream nano, comp, resu;
+  ifstream nano("../data/input/nanosphere_eV.dat");
+  if (!nano) {
+    cerr << "Error: Cannot open input file" << endl;
+    return 1;
+  }
+  ofstream resu("../data/output/results.dat");
+  if (!resu) {
+    cerr << "Error: Cannot open output file" << endl;
+    return 1;
+  }
+  ofstream comp("../data/output/compounds.dat");
+  if (!comp) {
+    cerr << "Error: Cannot open output file" << endl;
+    return 1;
+  }
   fstream solv, con1, con2, plb, ps01;
   nanosphere ns;
-  
-  nano.open("../data/input/nanosphere_eV.dat", ios::in);
-  resu.open("../data/output/results.dat", ios::out);
-  comp.open("../data/output/compounds.dat", ios::out);
 
     
   nano>>ns.r1>>ns.Dome>>ns.ome_0>>ns.G>>omemi>>omema>>mtl>>mdl>>active>>sol>>E0>>ns.rap>>hst;

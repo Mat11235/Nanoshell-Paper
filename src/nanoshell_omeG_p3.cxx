@@ -164,9 +164,16 @@ int main(){
     
     nanosphere ns;
     
-    fstream nano, cd4p;
-    nano.open("../data/input/nanosphere_eV.dat", ios::in);
-    cd4p.open("../data/output/oGp/data4plot.dat", ios::out);
+    ifstream nano("../data/input/nanosphere_eV.dat");
+    if (!nano) {
+        cerr << "Error: Cannot open input file" << endl;
+        return 1;
+    }
+    ofstream cd4p("../data/output/oGp/data4plot.dat");
+    if (!cd4p) {
+        cerr << "Error: Cannot open output file" << endl;
+        return 1;
+    }
     
     nano>>ns.r1>>ns.Dome>>ns.ome_0>>ns.G>>omemi>>omema>>mtl>>mdl>>active>>sol>>E0>>rho>>hst;
     if (E0==0.) E0=1.e-30; // zero is problematic as a value for E0 
@@ -261,9 +268,16 @@ int main(){
     if(visok.size()!=0) complete(visok, omemi, omema, dome, 2.*fro[1]);
     else cout<<"frequency range not wide enough to calculate the eigenvalue zeroes"<<endl;
     
-    fstream isoa, isok;
-    isoa.open("../data/output/oGp/iso_al.dat", ios::out);
-    isok.open("../data/output/oGp/iso_ka.dat", ios::out);
+    ofstream isoa("../data/output/oGp/iso_al.dat");
+    if (!isoa) {
+        cerr << "Error: Cannot open output file" << endl;
+        return 1;
+    }
+    ofstream isok("../data/output/oGp/iso_ka.dat");
+    if (!isok) {
+        cerr << "Error: Cannot open output file" << endl;
+        return 1;
+    }
 
     for (int ii=0; ii<int(visoa.size()); ii++)
         isoa<<" "<<visoa[ii].first<<" "<<visoa[ii].second<<endl;
@@ -272,8 +286,11 @@ int main(){
         isok<<" "<<visok[ii].first<<" "<<visok[ii].second<<endl;
     isok.close();
     
-    fstream cemi;
-    cemi.open("../data/output/oGp/ome_G_p3.dat", ios::out);
+    ofstream cemi("../data/output/oGp/ome_G_p3.dat");
+    if (!cemi) {
+        cerr << "Error: Cannot open output file" << endl;
+        return 1;
+    }
     GN=500;
     omemi=0.5;
     omema=8.;
