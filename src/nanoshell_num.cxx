@@ -43,13 +43,27 @@ int main(int argc, char** argv){
         }
     omeeV=atof(argv[1]);
     
-    nanosphere ns;    
-    fstream nano, time, frlc, omga;
-
-    nano.open("../data/input/nanosphere_eV.dat", ios::in);
-    time.open("../data/input/time.dat", ios::in);
-    frlc.open("../data/output/frohlich.dat", ios::out);
-    omga.open("../data/output/omega.dat", ios::out);
+    nanosphere ns;
+    ifstream nano("../data/input/nanosphere_eV.dat");
+    if (!nano) {
+        cerr << "Error: Cannot open input file" << endl;
+        return 1;
+    }
+    ifstream time("../data/input/time.dat");
+    if (!time) {
+        cerr << "Error: Cannot open input file" << endl;
+        return 1;
+    }
+    ofstream frlc("../data/output/frohlich.dat");
+    if (!frlc) {
+        cerr << "Error: Cannot open output file" << endl;
+        return 1;
+    }
+    ofstream omga("../data/output/omega.dat");
+    if (!omga) {
+        cerr << "Error: Cannot open output file" << endl;
+        return 1;
+    }
     
     nano>>ns.r1>>ns.Dome>>ns.ome_0>>ns.G>>omemi>>omema>>mtl>>mdl>>active>>sol>>E0>>rho>>hst;
     time>>T>>tpump;    

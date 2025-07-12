@@ -157,9 +157,16 @@ int main(){
     
     nanosphere ns;
     
-    fstream nano, emix;
-    nano.open("../data/input/nanosphere_eV.dat", ios::in);
-    emix.open("../data/output/emission_maximum.dat", ios::out);
+    ifstream nano("../data/input/nanosphere_eV.dat");
+    if (!nano) {
+        cerr << "Error: Cannot open input file" << endl;
+        return 1;
+    }
+    ofstream emix("../data/output/emission_maximum.dat");
+    if (!emix) {
+        cerr << "Error: Cannot open output file" << endl;
+        return 1;
+    }
     
     nano>>ns.r1>>ns.Dome>>ns.ome_0>>ns.G>>omemi>>omema>>mtl>>mdl>>active>>sol>>E0>>rho>>hst;
     

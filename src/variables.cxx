@@ -37,9 +37,11 @@ int main(){
   
   char mtl[16], mdl[16], sol[16], hst[16], active[16];
   nanosphere ns;
-  fstream nano, res3;  
-  
-  nano.open("../data/input/nanosphere_eV.dat", ios::in);
+  ifstream nano("../data/input/nanosphere_eV.dat");
+  if (!nano) {
+    cerr << "Error: Cannot open input file" << endl;
+    return 1;
+  }
 
     
   nano>>ns.r1>>ns.Dome>>ns.ome_0>>ns.G>>omemi>>omema>>mtl>>mdl>>active>>sol>>E0>>rho>>hst;

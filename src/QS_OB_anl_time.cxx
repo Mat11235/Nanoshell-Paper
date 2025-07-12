@@ -57,15 +57,41 @@ int main(int argc, char** argv){
     char mtl[16], mdl[16], sol[16], active[16];
     double t, dt=0.001, T, to, t0=0., tpump;
     nanosphere ns;
-    fstream nano, time, comp, stat, lmda, dyna, omga;
-
-    nano.open("../data/input/nanosphere_eV.dat", ios::in);
-    time.open("../data/input/time.dat", ios::in);
-    stat.open("../data/output/stationary.dat", ios::out);
-    lmda.open("../data/output/lambda.dat", ios::out);
-    comp.open("../data/output/compounds.dat", ios::out);
-    dyna.open("../data/output/QS_OB_anltime.dat", ios::out);
-    omga.open("../data/output/omega.dat", ios::out);
+    ifstream nano("../data/input/nanosphere_eV.dat");
+    if (!nano) {
+        cerr << "Error: Cannot open input file" << endl;
+        return 1;
+    }
+    ifstream time("../data/input/time.dat");
+    if (!time) {
+        cerr << "Error: Cannot open input file" << endl;
+        return 1;
+    }
+    ofstream stat("../data/output/stationary.dat");
+    if (!stat) {
+        cerr << "Error: Cannot open output file" << endl;
+        return 1;
+    }
+    ofstream lmda("../data/output/lambda.dat");
+    if (!lmda) {
+        cerr << "Error: Cannot open output file" << endl;
+        return 1;
+    }
+    ofstream comp("../data/output/compounds.dat");
+    if (!comp) {
+        cerr << "Error: Cannot open output file" << endl;
+        return 1;
+    }
+    ofstream dyna("../data/output/QS_OB_anltime.dat");
+    if (!dyna) {
+        cerr << "Error: Cannot open output file" << endl;
+        return 1;
+    }
+    ofstream omga("../data/output/omega.dat");
+    if (!omga) {
+        cerr << "Error: Cannot open output file" << endl;
+        return 1;
+    }
 
     omga<<omeeV<<endl;
 

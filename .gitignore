@@ -10,6 +10,7 @@ bin/*
 !data/output/oGp/.gitkeep
 !data/output/rho/.gitkeep
 !img/.gitkeep
+!bin/.gitkeep
 
 # Ignore metadata file
 .conversion_metadata

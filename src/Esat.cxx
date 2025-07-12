@@ -37,16 +37,17 @@ int main(int argc, char** argv){
   
   char mtl[16], mdl[16], sol[16], hst[16], active[16];
   nanosphere ns;
-  fstream nano, res3;  
+  ifstream nano("../data/input/nanosphere_eV.dat");
+  if (!nano) {
+      cerr << "Error: Cannot open input file" << endl;
+      return 1;
+  }
   if (argv[1]==0){
       cout<<endl<<"  Usage: "<<argv[0]<<" <G/Gth>"<<endl<<endl;
       exit(0);
       }
   alpha=atof(argv[1]);
   
-  nano.open("../data/input/nanosphere_eV.dat", ios::in);
-
-    
   nano>>ns.r1>>ns.Dome>>ns.ome_0>>ns.G>>omemi>>omema>>mtl>>mdl>>active>>sol>>E0>>rho>>hst;
 
   ns.init();
