@@ -26,7 +26,7 @@
 using namespace std;
 
 /** Compile with:
-    g++ eV2rads.cxx -o ../bin/eV2radps
+    g++ eV2rads.cxx -o ../bin/eV2rads
 **/
 
 int main(int argc, char** argv) {
