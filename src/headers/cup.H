@@ -649,6 +649,7 @@ std::complex<double> metal(double ome) {
 
 		// Initial conditions
 		dt  = 1.;
+		double t_stop = 0.0;
 
 		int Nt=T/dt;
 
@@ -708,7 +709,10 @@ std::complex<double> metal(double ome) {
 				alph = dip/E0;
 
 				if (t*1.e+12/omep>2.*tpump){
-					if (fabs((norm(dip)-dnormem)/norm(dip)) < 1.e-30 && steste==1) break;
+					if (fabs((norm(dip)-dnormem)/norm(dip)) < 1.e-30 && steste==1){ 
+  						t_stop = t_ps;
+						break;
+ 					}
 					if (fabs((norm(dip)-dnormem)/norm(dip)) < 1.e-10) wb=1;
 	// 				if (wb==1 && i%iprint==0){
 					if (wb==1){
@@ -730,7 +734,7 @@ std::complex<double> metal(double ome) {
 				if (wave.size()>=150000) wave.erase(wave.begin(), wave.begin() +  50000);
 				}
 
-			dyna<<"  "<<std::setw(8)<<std::setiosflags (std::ios::left)<< t_ps << // 1 time (ps)
+			dyna<<"  "<<std::setw(8)<<std::setiosflags (std::ios::left)<< t_stop << // 1 time (ps)
 				"\t"<<std::setw(13)<<std::setiosflags (std::ios::left)<<E0<<     // 2 E0
 				std::endl;
 
