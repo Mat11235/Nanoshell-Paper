@@ -735,7 +735,7 @@ std::complex<double> metal(double ome) {
 				}
 
 			if(i%iprint==0){
-			dyna<<"  "<<std::setw(8)<<std::setiosflags (std::ios::left)<<t/omep*1.e+12<< // 1 time (ps)
+			dyna<<"  "<<std::setw(8)<<std::setiosflags (std::ios::left)<< t_ps < // 1 time (ps)
 				"\t"<<std::setw(13)<<std::setiosflags (std::ios::left)<<E0<<     // 2 E0
 				std::endl;
 			}
