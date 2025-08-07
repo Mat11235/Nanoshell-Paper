@@ -64,7 +64,7 @@ int main(int argc, char** argv) {
     fro=simulation.frohlich(omemi, omema, eps_b, eps3, rho);
     // Calculate the saturation electric field Esat
     double ntau1, ntau2;
-    ntau2 = 2./ns.Dome;
+    ntau2 = 2./simulation.Dome;
     ntau1 = 5.*ntau2;
 
     double nEsat = sqrt(1/(fabs(simulation.G)*ntau1));
