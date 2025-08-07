@@ -651,11 +651,6 @@ std::complex<double> metal(double ome) {
 		dt  = 1.;
 
 		int Nt=T/dt;
-		int Nprint=Nt;
-
-		if(Nt > 50000) Nprint=50000;    
-// 		if(Nt > 500000) Nprint=500000;    
-		int iprint=Nt/Nprint;
 
 		//Introduction of the for-loop
 		double E0_min = 1e-15 * nEsat;
