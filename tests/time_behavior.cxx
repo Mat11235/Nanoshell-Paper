@@ -62,7 +62,15 @@ int main(int argc, char** argv) {
 
  
     fro=simulation.frohlich(omemi, omema, eps_b, eps3, rho);
-    
+    // Calculate the saturation electric field Esat
+    double ntau1, ntau2;
+    ntau2 = 2./ns.Dome;
+    ntau1 = 5.*ntau2;
+
+    double nEsat = sqrt(1/(fabs(simulation.G)*ntau1));
+    double nEsatup2 = 1/(fabs(simulation.G)*ntau1);
+
+	
     // Inform the user about the test
     cout << "Calculating the time_behavior up to "<<T<<" ps\n";
     cout << "                switching the pump on at "<<tpump<<"ps ...\n\n";
@@ -81,6 +89,8 @@ int main(int argc, char** argv) {
     simulation.analytical(mdl, mtl, hst, E0, omeeV, T, tpump, sol, rho);
     cout << "Running numerical calculation...\n";
     simulation.numerical(mdl, mtl, hst, E0, omeeV, T, tpump, sol, rho);
+    cout << "Running probe field loop test...\n"
+    simulation.probetest(mdl, mtl, hst, E0, omeeV, T, tpump, sol, rho);
 
     // Output the results
 
