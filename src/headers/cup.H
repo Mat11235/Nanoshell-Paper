@@ -655,7 +655,7 @@ std::complex<double> metal(double ome) {
 		//Introduction of the for-loop
 		double E0_min = 1e-15 * nEsat;
 		double E0_max = 1e-5  * nEsat;
-		int    Npts   = 100;
+		int    Npts   = 3000;
 		double dE0     = (E0_max - E0_min) / (Npts - 1);
 
 
