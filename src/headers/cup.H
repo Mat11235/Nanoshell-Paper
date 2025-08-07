@@ -735,11 +735,9 @@ std::complex<double> metal(double ome) {
 				if (wave.size()>=150000) wave.erase(wave.begin(), wave.begin() +  50000);
 				}
 
-			if(i%iprint==0){
 			dyna<<"  "<<std::setw(8)<<std::setiosflags (std::ios::left)<< t_ps << // 1 time (ps)
 				"\t"<<std::setw(13)<<std::setiosflags (std::ios::left)<<E0<<     // 2 E0
 				std::endl;
-			}
 
 			if (ns == 1){
 				if (wave.size()>0) nOme=nfindOme(wave.size(), wave, dt);
