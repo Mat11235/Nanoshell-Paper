@@ -68,7 +68,7 @@ int main(int argc, char** argv) {
     ntau1 = 5.*ntau2;
 
     double nEsat = sqrt(1/(fabs(simulation.G)*ntau1));
-    double nEsatup2 = 1/(fabs(simulation.G)*ntau1);
+    //double nEsatup2 = 1/(fabs(simulation.G)*ntau1);
 
 	
     // Inform the user about the test
@@ -90,7 +90,7 @@ int main(int argc, char** argv) {
     cout << "Running numerical calculation...\n";
     simulation.numerical(mdl, mtl, hst, E0, omeeV, T, tpump, sol, rho);
     cout << "Running probe field loop test...\n"
-    simulation.probetest(mdl, mtl, hst, E0, omeeV, T, tpump, sol, rho);
+    simulation.probetest(mdl, mtl, hst, nEsat, omeeV, tpump, sol, rho);
 
     // Output the results
 
