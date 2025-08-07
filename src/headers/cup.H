@@ -683,6 +683,7 @@ std::complex<double> metal(double ome) {
 			int i=0, pip=0;;
 			//double Tperiod = 50;
 			//double duty = 0.5;
+            double t_ps;
 
 
 			while (i<=Nt){// && (fabs(norm(dip)-dnormem)> 1.e-20 || t*1.e+12/omep<12*tpump)){
@@ -690,7 +691,7 @@ std::complex<double> metal(double ome) {
 				i++;
 
 				//Introduccion de una onda cuadrada para el bombeo
-				double t_ps    = t * 1.e+12 / omep;  // tiempo actual en ps
+				t_ps    = t * 1.e+12 / omep;  // tiempo actual en ps
 				dflt(&tildeN, t_ps, tpump, &pip);
 				//squarewave(&tildeN, Tperiod, duty, t_ps,tpump, &GG, G, tau2);
 				//sinusoidalwave(&tildeN, Tperiod, t_ps, &GG, G, tau2);
@@ -735,7 +736,7 @@ std::complex<double> metal(double ome) {
 				}
 
 			if(i%iprint==0){
-			dyna<<"  "<<std::setw(8)<<std::setiosflags (std::ios::left)<< t_ps < // 1 time (ps)
+			dyna<<"  "<<std::setw(8)<<std::setiosflags (std::ios::left)<< t_ps << // 1 time (ps)
 				"\t"<<std::setw(13)<<std::setiosflags (std::ios::left)<<E0<<     // 2 E0
 				std::endl;
 			}
@@ -755,8 +756,6 @@ std::complex<double> metal(double ome) {
 		delete [] p1;
 		delete [] p2;
 		delete [] p3;
-		delete [] q;
-
 
 		return dip;
 		}
