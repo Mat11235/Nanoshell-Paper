@@ -649,7 +649,7 @@ std::complex<double> metal(double ome) {
 
 		// Initial conditions
 		dt  = 1.;
-		double t_stop = 0.0;
+		//double t_stop = 0.0;
 
 		int Nt=T/dt;
 
@@ -710,7 +710,7 @@ std::complex<double> metal(double ome) {
 
 				if (t*1.e+12/omep>2.*tpump){
 					if (fabs((norm(dip)-dnormem)/norm(dip)) < 1.e-30 && steste==1){ 
-  						t_stop = t_ps;
+  						//t_stop = t_ps;
 						break;
  					}
 					if (fabs((norm(dip)-dnormem)/norm(dip)) < 1.e-10) wb=1;
