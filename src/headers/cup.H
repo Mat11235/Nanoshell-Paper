@@ -575,7 +575,8 @@ std::complex<double> metal(double ome) {
 		int steste=1; //It does change, but it is not required to be on the loop
 
 		std::complex<double> eps1e, eps2e, eps1, eps2, alph;
-		double omep, t, tau1, tau2, gamd, ome0, pG = fabs(G), *nv, tildeN;
+		double omep, t, tau1, tau2, gamd, ome0, *nv, tildeN;
+		//pG = fabs(G),
 		std::complex<double> GG, OmeH, chiH, GamP, OmeP, chiP, **A, *B, *p0, *p1, *p2, *p3, *p, dip, po, *odv;
 		
 		double omeR;
