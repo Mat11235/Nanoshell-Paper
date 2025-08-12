@@ -880,7 +880,9 @@ std::complex<double> metal(double ome) {
 		// These variables just work on specific functions
 		int pip = 0;
 		//double Tperiod = 50;
+		//double Eperiod;
 		//double duty = 0.5;
+		//double E0_temp = E0;
 
 		while (i<=Nt){// && (fabs(norm(dip)-dnormem)> 1.e-20 || t*1.e+12/omep<12*tpump)){
 		    t=i*dt;
@@ -888,6 +890,15 @@ std::complex<double> metal(double ome) {
 
 		//Introduccion de una onda cuadrada para el bombeo
 		double t_ps    = t * 1.e+12 / omep;  // tiempo actual en ps
+
+		//Introduction of a square wave as the electric field
+		//double local_t = fmod(t_ps, Eperiod);
+			    //if (local_t < duty * Eperiod) {
+			        //E0 = 0;
+			    //} else {
+			        //E0 = E0_temp;
+			    //}
+		
 		dflt(&tildeN, t_ps, tpump, &pip);
 		//squarewave(&tildeN, Tperiod, duty, t_ps,tpump, &GG, G, tau2);
 		//sinusoidalwave(&tildeN, Tperiod, t_ps, &GG, G, tau2);
