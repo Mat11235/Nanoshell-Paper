@@ -759,7 +759,6 @@ std::complex<double> metal(double ome) {
 		}
 	    
 	    std::complex<double> numerical(char* mdl , char* mtl ,char* hst, double E0, double omeeV, double T, double tpump, char* sol=0, double rho=0){
-		T=0;
 		double eps_b, eps_s, ome, dt, dnormem=1.e20, dnavr=0, dnavrm=1.e20;
 		std::vector<std::complex<double>> wave;
 		int ns=0, wb=0.;
