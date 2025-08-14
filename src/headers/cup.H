@@ -664,7 +664,6 @@ std::complex<double> metal(double ome) {
 		for (int k = 0; k < Npts; ++k) {
 		    double frac = double(k) / (Npts - 1);
 		    double E0 = Emin * std::pow(ratio, frac);
-			for (double E0 = E0_min; E0 <= E0_max + 1e-30; E0 += dE0){
 
 			//Variables that must be initialized once the for loop starts
 			double dnormem=1.e20, dnavr=0, dnavrm=1.e20;
@@ -749,7 +748,6 @@ std::complex<double> metal(double ome) {
 
 			wave.clear();
 			delete [] q;
-			}
 		}
 		
 // 		std::cout<<"nOme = "<<nOme<<std::endl;
