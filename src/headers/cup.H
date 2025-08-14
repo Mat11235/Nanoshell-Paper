@@ -667,7 +667,7 @@ std::complex<double> metal(double ome) {
 			//Variables that must be initialized once the for loop starts
 			double dnormem=1.e20, dnavr=0, dnavrm=1.e20;
 			int wb=0.;
-			double dpTOT=0, t0;
+			double dpTOT=0, t0=0.0;
 			int AVE=0;
 
 			double N=0;
