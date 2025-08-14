@@ -705,41 +705,43 @@ std::complex<double> metal(double ome) {
 				delete [] A;
 				delete [] B;
 				
-				dnormem = steste*norm(dip);
-				dip = numerical_output(E0, q, p);
-				alph = dip/E0;
-
-				if (t*1.e+12/omep>2.*tpump){
-					if (fabs((norm(dip)-dnormem)/norm(dip)) < 1.e-30 && steste==1){ 
-  						//t_stop = t_ps;
-						std::cout << std::endl;
-						std::cout << " 1st " << "E0 = " << E0 << " " << "t = " << t_ps;
-						std::cout << std::endl;
-						break;
- 					}
-					if (fabs((norm(dip)-dnormem)/norm(dip)) < 1.e-10) wb=1;
-	// 				if (wb==1 && i%iprint==0){
-					if (wb==1){
-						wave.push_back(q[0]);
-						}
-					if (fabs((dnavr-dnavrm)/dnavr) < 1.e-7 && steste==1){
-						std::cout << std::endl;
-						std::cout << " 2ndst " << "E0 = " << E0 << " " << "t = " << t_ps;
-						std::cout << std::endl;
-						break;
-						}
-					if (AVE==0){
-						t0=t;
-						AVE=1;
-						}
-					dpTOT = dpTOT+norm(dip);
-					if (t-t0 >= 1000/omeR){
-						dnavrm=dnavr;
-						dnavr=dpTOT/(t-t0);
-						AVE=0;
-						dpTOT =0;
-						}
-					}
+								// --- ACTUALIZA dipolo y normas ---
+				double prev = steste * std::norm(dip);   // antes: dnormem = ...
+				dip  = numerical_output(E0, q, p);
+				alph = dip / E0;
+				double curr = std::norm(dip);
+				double denom1 = std::max(curr, 1e-300);  // protege /0
+				
+				if (t_ps > 2.0 * tpump) {
+				    // ----- BREAK 1: variación instantánea muy pequeña -----
+				    if (std::fabs((curr - prev) / denom1) < 1.e-30 && steste == 1) {
+				        std::cout << "\n 1st E0 = " << E0 << " t = " << t_ps << std::endl;
+				        break;
+				    }
+				
+				    // escritura de la onda cuando hay cuasi-estacionariedad instantánea
+				    if (std::fabs((curr - prev) / denom1) < 1.e-10) wb = 1;
+				    if (wb == 1) wave.push_back(q[0]);
+				
+				    // ----- VENTANA DE PROMEDIO -----
+				    if (AVE == 0) { t0 = t; AVE = 1; }   // abre ventana aquí
+				    dpTOT += curr;
+				
+				    // cuando la ventana termina, actualiza promedios y evalúa BREAK 2
+				    if ((t - t0) >= 1000.0 / omeR) {
+				        dnavrm = dnavr;                   // promedio previo (ventana completa)
+				        dnavr  = dpTOT / (t - t0);        // promedio nuevo (ventana que acaba)
+				        AVE = 0;                          // reinicia ventana
+				        dpTOT = 0.0;
+				
+				        double denom2 = std::max(dnavr, 1e-300);
+				        // ----- BREAK 2: cambio entre promedios sucesivos muy pequeño -----
+				        if (std::fabs((dnavr - dnavrm) / denom2) < 1.e-7 && steste == 1) {
+				            std::cout << " 2ndst E0 = " << E0 << " t = " << t_ps << std::endl;
+				            break;
+				        }
+				    }
+				 }
 				if (wave.size()>=150000) wave.erase(wave.begin(), wave.begin() +  50000);
 				}
 
