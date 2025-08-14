@@ -722,12 +722,13 @@ std::complex<double> metal(double ome) {
 					if (wb==1){
 						wave.push_back(q[0]);
 						}
-					if (fabs((dnavr-dnavrm)/dnavr) < 1.e-7 && steste==1) break;
-					if (AVE==0){
+					if (fabs((dnavr-dnavrm)/dnavr) < 1.e-7 && steste==1){
 						std::cout << std::endl;
 						std::cout << " 2ndst " << "E0 = " << E0 << " " << "t = " << t_ps;
 						std::cout << std::endl;
 						break;
+						}
+					if (AVE==0){
 						t0=t;
 						AVE=1;
 						}
