@@ -797,10 +797,10 @@ std::complex<double> metal(double ome) {
 		    steste=1;
 		    }
 
-		std::fstream dyna, fnct, prb;
+		std::fstream dyna, fnct;
 		dyna.open("../data/output/numtime.dat", std::ios::out);
 		fnct.open("../data/output/numfunc.dat", std::ios::out);
-		prb.open("../data/output/probetime.dat", std::ios::out);
+		//prb.open("../data/output/probetime.dat", std::ios::out);
 		
 		dyna<<"# * NUMERICAL * "<<std::endl;
 		dyna<<"#"<<std::endl;
@@ -945,9 +945,9 @@ std::complex<double> metal(double ome) {
 				}
 			if (t*1.e+12/omep>2.*tpump){
 				if (fabs((norm(dip)-dnormem)/norm(dip)) < 1.e-30 && steste==1){
-					prb <<"  "<<std::setw(8)<<std::setiosflags (std::ios::left)<< t_ps << // 1 time (ps)
-				    "\t"<<std::setw(13)<<std::setiosflags (std::ios::left)<<E0<<     // 2 E0
-				    std::endl;
+					//prb <<"  "<<std::setw(8)<<std::setiosflags (std::ios::left)<< t_ps << // 1 time (ps)
+				    //"\t"<<std::setw(13)<<std::setiosflags (std::ios::left)<<E0<<     // 2 E0
+				    //std::endl;
 					break;
 				}
 				if (fabs((norm(dip)-dnormem)/norm(dip)) < 1.e-10) wb=1;
