@@ -79,8 +79,8 @@ class nanosphere{
 	void dflt(double* tildeN, double t_ps, double tpump, int* pip){
 		if(t_ps >= tpump && *pip ==0) {
 			*tildeN = 1.;
-			G = 0.1414;
-		 	GG = set_GG(G, tau2);
+			//G = 0.1414;
+		 	//GG = set_GG(G, tau2);
 			*pip = 1;
 		}
 	}
@@ -577,7 +577,7 @@ std::complex<double> metal(double ome) {
 
 		std::complex<double> eps1e, eps2e, eps1, eps2, alph;
 		double omep, t, tau1, tau2, gamd, ome0, *nv, tildeN;
-		//pG = fabs(G),
+		pG = fabs(G),
 		std::complex<double> GG, OmeH, chiH, GamP, OmeP, chiP, **A, *B, *p0, *p1, *p2, *p3, *p, dip, po, *odv;
 		
 		double omeR;
