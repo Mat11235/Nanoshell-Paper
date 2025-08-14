@@ -713,9 +713,9 @@ std::complex<double> metal(double ome) {
 				if (t*1.e+12/omep>2.*tpump){
 					if (fabs((norm(dip)-dnormem)/norm(dip)) < 1.e-30 && steste==1){ 
   						//t_stop = t_ps;
-						cout << endl;
-						cout << "E0 = " << E0 << " " << "t = " << t;
-						cout << endl;
+						std::cout << std::endl;
+						std::cout << "E0 = " << E0 << " " << "t = " << t;
+						std::cout << std::endl;
 						break;
  					}
 					if (fabs((norm(dip)-dnormem)/norm(dip)) < 1.e-10) wb=1;
