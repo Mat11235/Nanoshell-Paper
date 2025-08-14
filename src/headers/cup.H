@@ -671,8 +671,7 @@ std::complex<double> metal(double ome) {
 			int AVE=0;
 
 			double N=0;
-			std::complex<double> *q ;
-			q = new std::complex<double>[3] {0,0};
+			std::complex<double>* q = new std::complex<double>[3]{0.0, 0.0, 0.0};
 
 			// let's begin without pump
 			tildeN = 0;
@@ -714,7 +713,7 @@ std::complex<double> metal(double ome) {
 					if (fabs((norm(dip)-dnormem)/norm(dip)) < 1.e-30 && steste==1){ 
   						//t_stop = t_ps;
 						std::cout << std::endl;
-						std::cout << "E0 = " << E0 << " " << "t = " << t_ps;
+						std::cout << " 1st " << "E0 = " << E0 << " " << "t = " << t_ps;
 						std::cout << std::endl;
 						break;
  					}
@@ -725,6 +724,10 @@ std::complex<double> metal(double ome) {
 						}
 					if (fabs((dnavr-dnavrm)/dnavr) < 1.e-7 && steste==1) break;
 					if (AVE==0){
+						std::cout << std::endl;
+						std::cout << " 2ndst " << "E0 = " << E0 << " " << "t = " << t_ps;
+						std::cout << std::endl;
+						break;
 						t0=t;
 						AVE=1;
 						}
