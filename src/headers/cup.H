@@ -767,6 +767,7 @@ std::complex<double> metal(double ome) {
 		}
 	    
 	    std::complex<double> numerical(char* mdl , char* mtl ,char* hst, double E0, double omeeV, double T, double tpump, char* sol=0, double rho=0){
+		T=0;
 		double eps_b, eps_s, ome, dt, dnormem=1.e20, dnavr=0, dnavrm=1.e20;
 		std::vector<std::complex<double>> wave;
 		int ns=0, wb=0.;
@@ -949,9 +950,9 @@ std::complex<double> metal(double ome) {
 				}
 			if (t*1.e+12/omep>2.*tpump){
 				if (fabs((norm(dip)-dnormem)/norm(dip)) < 1.e-30 && steste==1){
-					//prb <<"  "<<std::setw(8)<<std::setiosflags (std::ios::left)<< t_ps << // 1 time (ps)
-				    //"\t"<<std::setw(13)<<std::setiosflags (std::ios::left)<<E0<<     // 2 E0
-				    //std::endl;
+					std::cout << std::endl;
+					std::cout << " 1st " << "E0 = " << E0 << " " << "t = " << t_ps;
+					std::cout << std::endl;
 					break;
 				}
 				if (fabs((norm(dip)-dnormem)/norm(dip)) < 1.e-10) wb=1;
@@ -959,7 +960,11 @@ std::complex<double> metal(double ome) {
 				if (wb==1){
 				    wave.push_back(q[0]);
 				    }
-				if (fabs((dnavr-dnavrm)/dnavr) < 1.e-7 && steste==1) break;
+				if (fabs((dnavr-dnavrm)/dnavr) < 1.e-7 && steste==1) {
+					std::cout << std::endl;
+					std::cout << " 2nd " << "E0 = " << E0 << " " << "t = " << t_ps;
+					std::cout << std::endl;
+					break;}
 				if (AVE==0){
 					t0=t;
 					AVE=1;
