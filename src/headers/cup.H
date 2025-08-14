@@ -655,7 +655,7 @@ std::complex<double> metal(double ome) {
 		int Nt=T/dt;
 
 		//Introduction of the for-loop
-		const int Npts = 500;
+		const int Npts = 100;
 		const double Emin = 1e-15 * nEsat;
 		const double Emax = 1e-5  * nEsat;
 		const double ratio = Emax / Emin;
