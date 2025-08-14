@@ -655,7 +655,7 @@ std::complex<double> metal(double ome) {
 		int Nt=T/dt;
 
 		//Introduction of the for-loop
-		const int Npts = 20;
+		const int Npts = 15;
 		const double Emin = 1e-15 * nEsat;
 		const double Emax = 1e-5  * nEsat;
 		const double ratio = Emax / Emin;
@@ -714,7 +714,7 @@ std::complex<double> metal(double ome) {
 					if (fabs((norm(dip)-dnormem)/norm(dip)) < 1.e-30 && steste==1){ 
   						//t_stop = t_ps;
 						std::cout << std::endl;
-						std::cout << "E0 = " << E0 << " " << "t = " << t;
+						std::cout << "E0 = " << E0 << " " << "t = " << t_ps;
 						std::cout << std::endl;
 						break;
  					}
