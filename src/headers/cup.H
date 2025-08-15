@@ -722,24 +722,25 @@ std::complex<double> metal(double ome) {
 					if (wb==1){
 						wave.push_back(q[0]);
 						}
-					if (fabs((dnavr-dnavrm)/dnavr) < 1.e-7 && steste==1){
-						std::cout << std::endl;
-						std::cout << " 2ndst " << "E0 = " << E0 << " " << "t = " << t_ps;
-						std::cout << std::endl;
-						break;
-						}
 					if (AVE==0){
 						t0=t;
 						AVE=1;
 						}
 					dpTOT = dpTOT+norm(dip);
-					if (t-t0 >= 1000/omeR){
-						dnavrm=dnavr;
-						dnavr=dpTOT/(t-t0);
-						AVE=0;
-						dpTOT =0;
+					if (t - t0 >= 1000/omeR) {
+						dnavrm = dnavr;
+						dnavr  = dpTOT / (t - t0);
+						AVE = 0; dpTOT = 0.0;
+
+						double denom2 = std::max(dnavr, 1e-300);
+						if (fabs((dnavr - dnavrm) / denom2) < 1e-7 && steste==1) {
+							std::cout << std::endl;
+							std::cout << " 2ndst " << "E0 = " << E0 << " " << "t = " << t_ps;
+							std::cout << std::endl;
+							break;
 						}
 					}
+				  }
 				if (wave.size()>=150000) wave.erase(wave.begin(), wave.begin() +  50000);
 				}
 
