@@ -106,7 +106,7 @@ class nanosphere{
 	    *tildeN = 0.5 * (1.0 - std::cos(2.0 * M_PI * t_ps / Tperiod));
 	    // (equivalente a 0.5*(1 + sin(2π t/T - π/2)))
 	    if (*tildeN > 0.3) {
-	        *GG = set_GG(-0.14, tau2);
+	        *GG = set_GG(0.1414, tau2);
 	    } else {
 	        *GG = set_GG(G, tau2);
 	    }
