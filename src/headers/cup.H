@@ -953,9 +953,9 @@ std::complex<double> metal(double ome) {
 				}
 			if (t*1.e+12/omep>2.*tpump){
 				if (fabs((norm(dip)-dnormem)/norm(dip)) < 1.e-30 && steste==1){
-					std::cout << std::endl;
-					std::cout << " 1st " << "E0 = " << E0 << " " << "t = " << t_ps;
-					std::cout << std::endl;
+					//std::cout << std::endl;
+					//std::cout << " 1st " << "E0 = " << E0 << " " << "t = " << t_ps;
+					//std::cout << std::endl;
 					break;
 				}
 				if (fabs((norm(dip)-dnormem)/norm(dip)) < 1.e-10) wb=1;
@@ -964,9 +964,9 @@ std::complex<double> metal(double ome) {
 				    wave.push_back(q[0]);
 				    }
 				if (fabs((dnavr-dnavrm)/dnavr) < 1.e-7 && steste==1) {
-					std::cout << std::endl;
-					std::cout << " 2nd " << "E0 = " << E0 << " " << "t = " << t_ps;
-					std::cout << std::endl;
+					//std::cout << std::endl;
+					//std::cout << " 2nd " << "E0 = " << E0 << " " << "t = " << t_ps;
+					//std::cout << std::endl;
 					break;}
 				if (AVE==0){
 					t0=t;
