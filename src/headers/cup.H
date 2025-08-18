@@ -771,7 +771,6 @@ std::complex<double> metal(double ome) {
 		}
 	    
 	    std::complex<double> numerical(char* mdl , char* mtl ,char* hst, double E0, double omeeV, double T, double tpump, char* sol=0, double rho=0){
-		T=0;
 		double eps_b, eps_s, ome, dt, dnormem=1.e20, dnavr=0, dnavrm=1.e20;
 		std::vector<std::complex<double>> wave;
 		int ns=0, wb=0.;
@@ -891,7 +890,7 @@ std::complex<double> metal(double ome) {
 
 		// These variables just work on specific functions
 		int pip = 0;
-		//double Tperiod = 50;
+		double Tperiod = 50;
 		//double Eperiod;
 		//double duty = 0.5;
 		//double E0_temp = E0;
@@ -911,9 +910,9 @@ std::complex<double> metal(double ome) {
 			        //E0 = E0_temp;
 			    //}
 		
-		dflt(&tildeN, t_ps, tpump, &pip);
+		//dflt(&tildeN, t_ps, tpump, &pip);
 		//squarewave(&tildeN, Tperiod, duty, t_ps,tpump, &GG, G, tau2);
-		//sinusoidalwave(&tildeN, Tperiod, t_ps, &GG, G, tau2);
+		sinusoidalwave(&tildeN, Tperiod, t_ps, &GG, G, tau2);
 
 		//Aqui termina el cambio
 
