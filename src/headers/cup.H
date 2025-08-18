@@ -91,7 +91,7 @@ class nanosphere{
 			    double local_t = fmod(t_ps - tpump, Tperiod);
 			    if (local_t < duty * Tperiod) {
 			        *tildeN = 1.;  // bomba encendida
-				*GG = set_GG(-0.14, tau2);
+				*GG = set_GG(0.1414, tau2);
 			    } else {
 			        *tildeN = 0;  // bomba apagada
 				*GG = set_GG(G, tau2);
