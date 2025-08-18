@@ -889,7 +889,7 @@ std::complex<double> metal(double ome) {
 		int i=0;
 
 		// These variables just work on specific functions
-		int pip = 0;
+		//int pip = 0;
 		double Tperiod = 50;
 		//double Eperiod;
 		//double duty = 0.5;
