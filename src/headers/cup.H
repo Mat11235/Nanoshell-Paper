@@ -101,26 +101,16 @@ class nanosphere{
 			}
 	}
 
-	//void sinusoidalwave(double* tildeN, double Tperiod, double t_ps, std::complex<double>* GG, double G, double tau2) {
-	    // Rango [0,1] y N(0)=0
-	    //*tildeN = 0.5 * (1.0 - std::cos(2.0 * M_PI * t_ps / Tperiod));
-	    // (equivalente a 0.5*(1 + sin(2π t/T - π/2)))
-	    //if (*tildeN > 0.3) {
-	        //*GG = set_GG(0.1414, tau2);
-	    //} else {
-	        //*GG = set_GG(G, tau2);
-	    //}
-	//}
-
-	void sinusoidalwave(double* tildeN, double Tperiod, double t_ps, std::complex<double>* GG, double G, double tau2){ 
-		*tildeN = 0.5 * (1. + sin(2. * M_PI * t_ps / Tperiod)); 
-			if(*tildeN > 0.3){ 
-				*GG = set_GG(0.1414, tau2); 
-		} else { 
-			*GG = set_GG(G, tau2); 
-		}
+	void sinusoidalwave(double* tildeN, double Tperiod, double t_ps, std::complex<double>* GG, double G, double tau2) {
+	     Rango [0,1] y N(0)=0
+	    *tildeN = 0.5 * (1.0 - std::cos(2.0 * M_PI * t_ps / Tperiod));
+	     (equivalente a 0.5*(1 + sin(2π t/T - π/2)))
+	    if (*tildeN > 0.3) {
+	        *GG = set_GG(0.1414, tau2);
+	    } else {
+	        *GG = set_GG(G, tau2);
+	    }
 	}
-
 
 //Terminan las funciones numerical
 
