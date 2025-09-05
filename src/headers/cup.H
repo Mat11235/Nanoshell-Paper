@@ -816,7 +816,7 @@ std::complex<double> metal(double ome) {
 
 		// Convert Δ [eV] to τ [ps]: τ = 2ħ / Δ
 	    double ntau2 = 2.0 * hbar * j2eV / Dome; // in seconds
-	    double ntau2_ps = tau * ps;
+	    double ntau2_ps = ntau2 * ps;
 		double ntau1_ps = 5.0 * ntau2_ps;
 
 		
