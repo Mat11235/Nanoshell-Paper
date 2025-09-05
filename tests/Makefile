@@ -3,7 +3,7 @@ CFLAGS = -Wall -I../src/headers -L../src/lib
 LIBS = -lgsl -lgslcblas -lm -larmadillo
 
 # List of test programs
-TARGETS = time_behavior threshold steady_state tau_characterization
+TARGETS = time_behavior threshold steady_state tau_characterization oscillating_electricf
 
 # Define how to build each target
 all: $(TARGETS)
@@ -19,6 +19,9 @@ steady_state: steady_state.cxx
 
 tau_characterization: tau_characterization.cxx
 	$(CC) $(CFLAGS) tau_characterization.cxx -o tau_characterization $(LIBS)
+
+oscillating_electricf: oscillating_electricf.cxx
+	$(CC) $(CFLAGS) oscillating_electricf.cxx -o oscillating_electricf $(LIBS)
 
 clean:
 	rm -f $(TARGETS)
