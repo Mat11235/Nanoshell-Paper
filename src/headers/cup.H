@@ -842,6 +842,9 @@ std::complex<double> metal(double ome) {
 		fnct<<"# PARAMETERS: "<<std::endl;
 		fnct<<"# G = "<<pG<<std::endl;
 		fnct<<"# ome = "<<omeeV<<" eV"<<std::endl;
+		fnct<<"# linewidth Δ = "<<Dome<<" eV"<<std::endl;
+		fnct<<"# tau 1 = "<<ntau1_ps<<" ps"<<std::endl;
+		fnct<<"# tau 2 = "<<ntau2_ps<<" ps"<<std::endl;
 		fnct<<"# a "<<mdl<<" model was used for "<<mtl<<std::endl;
 		fnct<<"# ------------- "<<std::endl;
 		fnct<<"# t (ps)\treal(q0)\timag(q0)\treal(q1)\timag(q1)\treal(q2)\timag(q2)"<<std::endl;
@@ -1056,6 +1059,7 @@ std::complex<double> metal(double ome) {
 		dyna<<"# PARAMETERS: "<<std::endl;
 		dyna<<"# G = "<<pG<<std::endl;
 		dyna<<"# ome = "<<omeeV<<" eV"<<std::endl;
+		dyna<<"# Electric field amplitude = "<<E0<<std::endl;
 		dyna<<"# a "<<mdl<<" model was used for "<<mtl<<std::endl;
 		dyna<<"# ------------- "<<std::endl;
 		dyna<<"# t (ps)\treal(alph)\timag(alph)\treal(dip)\timag(dip)"<<std::endl;
@@ -1068,6 +1072,7 @@ std::complex<double> metal(double ome) {
 		fnct<<"# PARAMETERS: "<<std::endl;
 		fnct<<"# G = "<<pG<<std::endl;
 		fnct<<"# ome = "<<omeeV<<" eV"<<std::endl;
+		fnct<<"# Electric field amplitude = "<<E0<<std::endl;
 		fnct<<"# a "<<mdl<<" model was used for "<<mtl<<std::endl;
 		fnct<<"# ------------- "<<std::endl;
 		fnct<<"# t (ps)\treal(q0)\timag(q0)\treal(q1)\timag(q1)\treal(q2)\timag(q2)"<<std::endl;
