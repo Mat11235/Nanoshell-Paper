@@ -67,9 +67,9 @@ int main(int argc, char** argv) {
  
     fro=simulation.frohlich(omemi, omema, eps_b, eps3, rho);
     // Calculate the saturation electric field Esat
-    double ntau1, ntau2;
-    ntau2 = 2./simulation.Dome;
-    ntau1 = 5.*ntau2;
+    //double ntau1, ntau2;
+    //ntau2 = 2./simulation.Dome;
+    //ntau1 = 5.*ntau2;
 
     // Inform the user about the test
     cout << "Calculating the time_behavior up to "<<T<<" ps\n";
