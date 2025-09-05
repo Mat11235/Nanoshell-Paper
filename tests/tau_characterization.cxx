@@ -85,10 +85,9 @@ int main(int argc, char** argv) {
     cout << "  Solvent: " << sol << "\n";
     cout << "  Radius ratio: " << rho << "\n\n";
 
-    cout << "Running analytical calculation...\n";
-    simulation.analytical(mdl, mtl, hst, E0, omeeV, T, tpump, sol, rho);
-    cout << "Running numerical calculation...\n";
-    simulation.numerical(mdl, mtl, hst, E0, omeeV, T, tpump, sol, rho);
+
+    cout << "Running tau charachterization calculation...\n";
+    simulation.taucharacterization(mdl, mtl, hst, E0, omeeV, T, tpump, sol, rho);
     // Output the results
 
     // Save the results to a file
