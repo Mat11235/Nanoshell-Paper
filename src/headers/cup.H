@@ -774,7 +774,7 @@ std::complex<double> metal(double ome) {
 		return dip;
 		}
 
-			    std::complex<double> taucharacterization(char* mdl , char* mtl ,char* hst, double E0, double omeeV, double T, double tpump, char* sol=0, double rho=0){
+		std::complex<double> taucharacterization(char* mdl , char* mtl ,char* hst, double E0, double omeeV, double T, double tpump, char* sol=0, double rho=0){
 		double eps_b, eps_s, ome, dt, dnormem=1.e20, dnavr=0, dnavrm=1.e20;
 		std::vector<std::complex<double>> wave;
 		int ns=0, wb=0.;
@@ -813,6 +813,12 @@ std::complex<double> metal(double ome) {
 		dyna.open("../data/output/numtime.dat", std::ios::out);
 		fnct.open("../data/output/numfunc.dat", std::ios::out);
 		//prb.open("../data/output/probetime.dat", std::ios::out);
+
+		// Convert Δ [eV] to τ [ps]: τ = 2ħ / Δ
+	    double ntau2 = 2.0 * hbar * j2eV / Dome; // in seconds
+	    double ntau2_ps = tau * ps;
+		double ntau1_ps = 5.0 * ntau2_ps;
+
 		
 		dyna<<"# * NUMERICAL * "<<std::endl;
 		dyna<<"#"<<std::endl;
@@ -821,7 +827,9 @@ std::complex<double> metal(double ome) {
 		dyna<<"# PARAMETERS: "<<std::endl;
 		dyna<<"# G = "<<pG<<std::endl;
 		dyna<<"# ome = "<<omeeV<<" eV"<<std::endl;
-		//dyna<<"# linewidth Δ" = "<<Dome<<" eV"<<std::endl;
+		dyna<<"# linewidth Δ" = "<<Dome<<" eV"<<std::endl;
+		dyna<<"# tau 1" = "<<ntau1_ps<<" ps"<<std::endl;
+		dyna<<"# tau 2" = "<<ntau2_ps<<" ps"<<std::endl;
 		dyna<<"# a "<<mdl<<" model was used for "<<mtl<<std::endl;
 		dyna<<"# ------------- "<<std::endl;
 		dyna<<"# t (ps)\treal(alph)\timag(alph)\treal(dip)\timag(dip)"<<std::endl;
