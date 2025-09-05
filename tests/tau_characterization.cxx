@@ -35,13 +35,15 @@ using namespace std;
 int main(int argc, char** argv) {
     // Initialize variables for input parameters
     // Create an instance of the nanosphere class
-    double   omeeV, omemi, omema, E0, rho, *fro, tpump, T, eps3, eps_b;
+    double   omeeV, linewidth, omemi, omema, E0, rho, *fro, tpump, T, eps3, eps_b;
     char mtl[16], mdl[16], hst[16], sol[16], active[16];
     if (argv[1]==0){
         cout<<endl<<"  Usage: "<<argv[0]<<" <omega in eV>"<<endl<<endl;
         exit(0);
         }
     omeeV=atof(argv[1]);
+	linewidth = -1.0;                  // valor “no seteado” por defecto
+	if (argc >= 3) linewidth = atof(argv[2]);  // segundo argumento opcional in eV
     nanosphere  simulation;
     simulation.init();
     
@@ -52,6 +54,8 @@ int main(int argc, char** argv) {
     
     nano>>simulation.r1>>simulation.Dome>>simulation.ome_0>>simulation.G>>omemi>>omema>>mtl>>mdl>>active>>sol>>E0>>rho>>hst;
     time>>T>>tpump;  
+
+	simulation.Dome = linewidth;
         
     simulation.set_metal(mtl,mdl,1);
     simulation.set_active(active);
@@ -67,10 +71,6 @@ int main(int argc, char** argv) {
     ntau2 = 2./simulation.Dome;
     ntau1 = 5.*ntau2;
 
-    double nEsat = sqrt(1/(fabs(simulation.G)*ntau1));
-    //double nEsatup2 = 1/(fabs(simulation.G)*ntau1);
-
-	
     // Inform the user about the test
     cout << "Calculating the time_behavior up to "<<T<<" ps\n";
     cout << "                switching the pump on at "<<tpump<<"ps ...\n\n";
@@ -89,12 +89,6 @@ int main(int argc, char** argv) {
     simulation.analytical(mdl, mtl, hst, E0, omeeV, T, tpump, sol, rho);
     cout << "Running numerical calculation...\n";
     simulation.numerical(mdl, mtl, hst, E0, omeeV, T, tpump, sol, rho);
-	cout<<endl;
-    cout<<" > nEsat    = "<< nEsat <<endl;
-	cout<<endl;
-    cout << "Running probe field loop test...\n";
-    simulation.probetest(mdl, mtl, hst, nEsat, omeeV, tpump, sol, rho);
-
     // Output the results
 
     // Save the results to a file
