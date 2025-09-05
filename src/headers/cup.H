@@ -827,9 +827,9 @@ std::complex<double> metal(double ome) {
 		dyna<<"# PARAMETERS: "<<std::endl;
 		dyna<<"# G = "<<pG<<std::endl;
 		dyna<<"# ome = "<<omeeV<<" eV"<<std::endl;
-		dyna<<"# linewidth Δ" = "<<Dome<<" eV"<<std::endl;
-		dyna<<"# tau 1" = "<<ntau1_ps<<" ps"<<std::endl;
-		dyna<<"# tau 2" = "<<ntau2_ps<<" ps"<<std::endl;
+		dyna<<"# linewidth Δ = "<<Dome<<" eV"<<std::endl;
+		dyna<<"# tau 1 = "<<ntau1_ps<<" ps"<<std::endl;
+		dyna<<"# tau 2 = "<<ntau2_ps<<" ps"<<std::endl;
 		dyna<<"# a "<<mdl<<" model was used for "<<mtl<<std::endl;
 		dyna<<"# ------------- "<<std::endl;
 		dyna<<"# t (ps)\treal(alph)\timag(alph)\treal(dip)\timag(dip)"<<std::endl;
