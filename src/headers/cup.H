@@ -1128,7 +1128,6 @@ std::complex<double> metal(double ome) {
 		// let's begin without pump
 		tildeN = 0;
 	    
-		omeR = Rabi_frec(G, tau2, E0);
 		int i=0;
 
 		// These variables just work on specific functions
@@ -1152,6 +1151,7 @@ std::complex<double> metal(double ome) {
 			    } else {
 			        E0 = E0_temp;
 			    }
+		omeR = Rabi_frec(G, tau2, E0);
 		
 		//dflt(&tildeN, t_ps, tpump, &pip);
 		//squarewave(&tildeN, Tperiod, duty, t_ps,tpump, &GG, G, tau2);
@@ -1173,11 +1173,11 @@ std::complex<double> metal(double ome) {
 			
 		    dnormem = steste*norm(dip);
 		    dip = numerical_output(E0, q, p);
-		    alph = dip/E0;
+		    //alph = dip/E0;
 				if(i%iprint==0){
 				dyna<<"  "<<std::setw(8)<<std::setiosflags (std::ios::left)<<t/omep*1.e+12<< // 1 time (ps)
-					"\t"<<std::setw(13)<<std::setiosflags (std::ios::left)<<real(alph)<<     // 2 Re(alpha)
-					"\t"<<std::setw(13)<<std::setiosflags (std::ios::left)<<imag(alph)<<     // 3 Im(alpha)
+					//"\t"<<std::setw(13)<<std::setiosflags (std::ios::left)<<real(alph)<<     // 2 Re(alpha)
+					//"\t"<<std::setw(13)<<std::setiosflags (std::ios::left)<<imag(alph)<<     // 3 Im(alpha)
 					"\t"<<std::setw(13)<<std::setiosflags (std::ios::left)<<real(dip)<<     // 4 Re(dip)
 					"\t"<<std::setw(13)<<std::setiosflags (std::ios::left)<<imag(dip)<<     // 5 Im(dip)
 					"\t"<<std::setw(13)<<std::setiosflags (std::ios::left)<<N<<             // 6 N
