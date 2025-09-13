@@ -1,21 +1,46 @@
 /*
- * This file is part of the Nano-Shell Simulation Project.
- * 
- * Copyright (C) 2025 Alessandro Veltri
+ * Program: time_behavior
+ * Purpose: Configure a nanosphere/nanoshell simulation and run a
+ *          tau-characterization at a single frequency (omeeV).
  *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * CLI usage:
+ *   ./tim <omega_eV> [linewidth_eV]
+ *     - omega_eV     : excitation/analysis frequency in electron-volts (required).
+ *     - linewidth_eV : optional damping/linewidth to override the file value.
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- * GNU General Public License for more details.
+ * Inputs (text files):
+ *   ../data/input/nanosphere_eV.dat
+ *     -> r1  Dome  ome_0  G  omemi  omema  mtl  mdl  active  sol  E0  rho  hst
+ *   ../data/input/time.dat
+ *     -> T  tpump
  *
- * You should have received a copy of the GNU General Public License
- * along with this program. If not, see <https://www.gnu.org/licenses/>.
+ * Outputs (summary + whatever taucharacterization writes):
+ *   results/time_behavior.log
+ *   (Common output conventions in this project include:
+ *     ../data/output/anltime.dat, ../data/output/anlfunc.dat,
+ *     ../data/output/numtime.dat,  ../data/output/numfunc.dat)
+ *
+ * Notes:
+ *   - The optional second argument lets you override "Dome" (linewidth).
+ *   - If not provided, the Dome read from nanosphere_eV.dat is used.
  */
+
+// Variable legend:
+//   omeeV     : analysis frequency (eV), from CLI
+//   linewidth : optional CLI linewidth to override Dome (eV); -1 means "no override"
+//   omemi/omema: frequency bounds read from file (used by frohlich here)
+//   E0        : field amplitude read from file (used by taucharacterization)
+//   rho       : radius ratio / filling factor
+//   T         : total time window (ps)
+//   tpump     : pump-on time (ps)
+//   eps3/eps_b: dielectric constants for solvent/core returned by set_host
+//   Dome      : linewidth/damping parameter inside simulation (overridden if CLI is provided)
+//   G         : gain/coupling parameter; compared against fro[1] for stability warning
+
+// --- Parse command-line arguments ------------------------------------------------
+// argv[1]: required frequency in eV (omeeV)
+// argv[2]: optional linewidth in eV (to override the file's Dome)
+// Format: ./tim 2.8122 0.05 the last parameter is the linewidth
 
 #include <iostream>
 #include <iomanip>
@@ -26,24 +51,24 @@
 #include "../src/headers/nanoshell.H"
 #include "../src/headers/cup.H"
 
-/*
-g++ -Wall -I/usr/include/ -L/usr/local/lib time_behavior.cxx -o tim -lgsl -lgslcblas -lm -larmadillo
-*/
-
 using namespace std;
 
 int main(int argc, char** argv) {
     // Initialize variables for input parameters
     // Create an instance of the nanosphere class
+	
     double   omeeV, linewidth, omemi, omema, E0, rho, *fro, tpump, T, eps3, eps_b;
     char mtl[16], mdl[16], hst[16], sol[16], active[16];
+
+	
     if (argv[1]==0){
         cout<<endl<<"  Usage: "<<argv[0]<<" <omega in eV>"<<endl<<endl;
         exit(0);
         }
+	
     omeeV=atof(argv[1]);
-	linewidth = -1.0;                  // valor “no seteado” por defecto
-	if (argc >= 3) linewidth = atof(argv[2]);  // segundo argumento opcional in eV
+	linewidth = -1.0;                  // if not given, a default value is taken
+	if (argc >= 3) linewidth = atof(argv[2]);  // Second argument optional in eV
     nanosphere  simulation;
     simulation.init();
     
@@ -63,10 +88,9 @@ int main(int argc, char** argv) {
     eps_b=simulation.set_host(hst);
     
     // Perform the time_behavior calculation
-
  
     fro=simulation.frohlich(omemi, omema, eps_b, eps3, rho);
-    // Calculate the saturation electric field Esat
+    // Calculate of tau, but this is done inside the function tau_carachterization on cup.h
     //double ntau1, ntau2;
     //ntau2 = 2./simulation.Dome;
     //ntau1 = 5.*ntau2;
@@ -84,7 +108,6 @@ int main(int argc, char** argv) {
     cout << "  Core material: " << hst << "\n";
     cout << "  Solvent: " << sol << "\n";
     cout << "  Radius ratio: " << rho << "\n\n";
-
 
     cout << "Running tau charachterization calculation...\n";
     simulation.taucharacterization(mdl, mtl, hst, E0, omeeV, T, tpump, sol, rho);
