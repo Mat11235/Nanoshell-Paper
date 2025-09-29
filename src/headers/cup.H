@@ -1131,7 +1131,7 @@ std::complex<double> metal(double ome) {
 		int i=0;
 
 		// These variables just work on specific functions
-		int pip = 0;
+		//int pip = 0;
 		double Tperiod = 50;
 		double Eperiod = 20;
 		double duty = 0.5;
@@ -1153,9 +1153,9 @@ std::complex<double> metal(double ome) {
 			    }
 		omeR = Rabi_frec(G, tau2, E0);
 		
-		dflt(&tildeN, t_ps, tpump, &pip);
+		//dflt(&tildeN, t_ps, tpump, &pip);
 		//squarewave(&tildeN, Tperiod, duty, t_ps,tpump, &GG, G, tau2);
-		//sinusoidalwave(&tildeN, Tperiod, t_ps, &GG, G, tau2);
+		sinusoidalwave(&tildeN, Tperiod, t_ps, &GG, G, tau2);
 
 		//Aqui termina el cambio
 
