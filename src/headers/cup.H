@@ -1153,9 +1153,9 @@ std::complex<double> metal(double ome) {
 			    }
 		omeR = Rabi_frec(G, tau2, E0);
 		
-		//dflt(&tildeN, t_ps, tpump, &pip);
+		dflt(&tildeN, t_ps, tpump, &pip);
 		//squarewave(&tildeN, Tperiod, duty, t_ps,tpump, &GG, G, tau2);
-		sinusoidalwave(&tildeN, Tperiod, t_ps, &GG, G, tau2);
+		//sinusoidalwave(&tildeN, Tperiod, t_ps, &GG, G, tau2);
 
 		//Aqui termina el cambio
 
