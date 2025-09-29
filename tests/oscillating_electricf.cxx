@@ -1,21 +1,30 @@
 /*
- * This file is part of the Nano-Shell Simulation Project.
- * 
- * Copyright (C) 2025 Alessandro Veltri
+ * Driver: time_behavior
+ * Goal : Configure a nanoshell/nanosphere system and run a time-domain
+ *        simulation at a single frequency (omeeV), with optional E0 override.
  *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * Usage:
+ *   ./tim <omega_eV> [E0_override]
+ *     - omega_eV   : driving/analysis frequency in eV (required)
+ *     - E0_override: sets E0 from CLI (same units as file E0); if omitted,
+ *                    uses the value from nanosphere_eV.dat
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- * GNU General Public License for more details.
+ * Inputs:
+ *   ../data/input/nanosphere_eV.dat
+ *     r1 Dome ome_0 G omemi omema mtl mdl active sol E0 rho hst
+ *   ../data/input/time.dat
+ *     T tpump
  *
- * You should have received a copy of the GNU General Public License
- * along with this program. If not, see <https://www.gnu.org/licenses/>.
+ * Outputs (summary + whatever numericalOEF writes internally):
+ *   results/time_behavior.log
+ *   (Project-convention files: ../data/output/anltime.dat, anlfunc.dat,
+ *    numtime.dat, numfunc.dat — adjust message if your routine writes other names.)
  */
+
+// --- CLI args --------------------------------------------------------------
+// argv[1] : omeeV (eV) — required driving frequency
+// argv[2] : EfA (E0 override) — optional; if absent, keep E0 from file
+// NOTE: for production, prefer `if (argc < 2)` over `if (argv[1]==0)` to guard input.
 
 #include <iostream>
 #include <iomanip>
@@ -42,8 +51,8 @@ int main(int argc, char** argv) {
         exit(0);
         }
     omeeV=atof(argv[1]);
-	EfA = 1;                  // valor “no seteado” por defecto
-	if (argc >= 3) EfA = atof(argv[2]);  // segundo argumento opcional in eV
+	EfA = 1;                  // valor “no seteado” por defecto (Electric field amplitude)
+	if (argc >= 3) EfA = atof(argv[2]);  // segundo argumento opcional in eV 
     nanosphere  simulation;
     simulation.init();
     
