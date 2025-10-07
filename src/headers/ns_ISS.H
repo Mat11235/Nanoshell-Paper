@@ -398,7 +398,7 @@ double find_Omega1(nanosphere ns, double omeeV, char* hst, char* sol, double rho
     return Ome;
     }
     
-double *ISS_results(nanosphere* ns, double Ome, double ome1, double ome2, double omeeV, char* hst, char* sol=0, double rho=0, double E0){
+double *ISS_results(nanosphere ns, double Ome, double ome1, double ome2, double omeeV, char* hst, char* sol=0, double rho=0){
     std::complex<double> GG, OmeH, GamP, OmeP, gam1, gam2, xi, **A, cq0s, *vec, *odv;
     double *res, q0s, p1s, p2s, p3s, N, tau1, tau2, gamd, ome, ome0, *nv;
     std::complex<double>* p0, *p1, *p2, *p3;
@@ -417,18 +417,18 @@ double *ISS_results(nanosphere* ns, double Ome, double ome1, double ome2, double
     nv  = new double[4];
     odv = new std::complex<double> [3];
     
-    fro=*ns.frohlich(2., 3.4, eps_b, eps_s, rho);
+    fro=ns.frohlich(2., 3.4, eps_b, eps_s, rho);
     // normalized variables
     nv = ns.normalized_variables ();
     tau1 = nv[0];
     tau2 = nv[1];
     gamd = nv[2];
     ome0 = nv[3];
-    GG = ns->set_GG(ns.G, tau2);
+    GG = ns.set_GG(ns.G, tau2);
     
     ome  = omeeV/ns.Ome_p;
 
-    odv  = ns->set_ome_dep_vrbls(ome, ome0, tau2, gamd);
+    odv  = ns.set_ome_dep_vrbls(ome, ome0, tau2, gamd);
     OmeH = odv[0];
     OmeP = odv[1];
     GamP = odv[2];
@@ -472,13 +472,13 @@ double *ISS_results(nanosphere* ns, double Ome, double ome1, double ome2, double
     vec[2] = gam2;
     vec[3] = {0,0};
     
-    p1s = norm(numerical_output(E0, vec, p1))*q0s;
+    p1s = norm(numerical_output(0, vec, p1))*q0s;
     res[3] = p1s;
     
-    p2s = norm(numerical_output(E0, vec, p2))*q0s;
+    p2s = norm(numerical_output(0, vec, p2))*q0s;
     res[4] = p2s;
     
-    p3s = norm(numerical_output(E0, vec, p3))*q0s;
+    p3s = norm(numerical_output(0, vec, p3))*q0s;
     res[5] = p3s;    
 
     N = 1 - xi.imag()*q0s;
@@ -717,7 +717,7 @@ double *ISS_results(nanosphere* ns, double Ome, double ome1, double ome2, double
 
 std::complex<double>* simple_intensity_steady_state(nanosphere* ns, char* mdl, char* mtl, char* hst, double omeeV, char* sol,double rho, double E0){
     std::complex<double> GG, OmeH, GamP, OmeP, gam1, gam2, xi, **A, cq0s, *vec, *odv;
-    double *res, q0s, p1s, p2s, p3s, N, tau1, tau2, gamd, ome, ome0, ome1, ome2, Ome, *nv;
+    double q0s, p3s, tau1, tau2, gamd, ome, ome0, ome1, ome2, Ome, *nv;
     std::complex<double>* p0, *p1, *p2, *p3;
     double eps_b, eps_s, *fro;
 
