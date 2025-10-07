@@ -33,10 +33,6 @@ int main(int argc, char** argv) {
     
     nano>>simulation.r1>>simulation.Dome>>simulation.ome_0>>simulation.G>>omemi>>omema>>mtl>>mdl>>active>>sol>>E0>>rho>>hst;
     time>>T>>tpump;  
-
-    //Definition of Dome for the code to be consistent
-    int omeN=1000;
-    simulation.Dome = (omema-omemi)/omeN;
         
     simulation.set_metal(mtl,mdl,1);
     simulation.set_active(active);
