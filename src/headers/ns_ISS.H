@@ -17,7 +17,6 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include <cmath>
 std::complex<double> img = std::complex<double> (0., 1.);
 
 std::complex<double> gammaD (std::complex<double>** A, double Ome){
