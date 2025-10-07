@@ -584,7 +584,7 @@ std::complex<double> metal(double ome) {
 
 		std::complex<double> eps1e, eps2e, eps1, eps2, alph;
 		double omep, t, tau1, tau2, gamd, ome0, *nv, tildeN, pG = fabs(G);
-		std::complex<double> GG, OmeH, chiH, GamP, OmeP, chiP, **A, *B, *p0, *p1, *p2, *p3, *p, dip, po, *odv;
+		std::complex<double> GG, OmeH, chiH, GamP, OmeP, chiP, **A, *B, *p0, *p1, *p2, *p3, *p, dip, steady_dip, po, *odv;
 		
 		double omeR;
 
@@ -671,6 +671,8 @@ std::complex<double> metal(double ome) {
 		    double frac = double(k) / (Npts - 1);
 		    double E0 = Emin * std::pow(ratio, frac);
 
+			std::complex<double>* amplitudes = simple_intensity_steady_state(this, mdl, mtl, hst, omeeV, sol, rho, E0);
+
 			//Variables that must be initialized once the for loop starts
 			double dnormem=1.e20, dnavr=0, dnavrm=1.e20;
 			int wb=0.;
@@ -679,6 +681,13 @@ std::complex<double> metal(double ome) {
 
 			double N=0;
 			std::complex<double>* q = new std::complex<double>[3]{0.0, 0.0, 0.0};
+			std::complex<double>* Q = new std::complex<double>[3]{amplitudes[0], amplitudes[1], amplitudes[2]};
+			steady_dip = numerical_output(E0, Q, p);
+			std::cout << std::endl;
+			std::cout << "E0 = " << E0 << " Steady Dip = "<< norm(steady_dip);
+			std::cout << std::endl;
+			std::cout << "E0 = " << E0 << " P3 Dip = "<< norm(*amplitudes[3]);
+			std::cout << std::endl;
 
 			// let's begin without pump
 			tildeN = 0;
@@ -720,7 +729,8 @@ std::complex<double> metal(double ome) {
 					if (fabs((norm(dip)-dnormem)/norm(dip)) < 1.e-30 && steste==1){ 
   						//t_stop = t_ps;
 						std::cout << std::endl;
-						std::cout << " 1st " << "E0 = " << E0 << " " << "t = " << t_ps;
+						//std::cout << " 1st " << "E0 = " << E0 << " " << "t = " << t_ps;
+						std::cout << " 1st " << "E0 = " << E0 << " Dip = " << nomr(dip) <<" t = " << t_ps;
 						std::cout << std::endl;
 						break;
  					}
@@ -742,7 +752,8 @@ std::complex<double> metal(double ome) {
 						double denom2 = std::max(dnavr, 1e-300);
 						if (fabs((dnavr - dnavrm) / denom2) < 1e-7 && steste==1) {
 							std::cout << std::endl;
-							std::cout << " 2ndst " << "E0 = " << E0 << " " << "t = " << t_ps;
+							//std::cout << " 2ndst " << "E0 = " << E0 << " " << "t = " << t_ps;
+							std::cout << " 2nd " << "E0 = " << E0 << " Dip = " << nomr(dip) <<" t = " << t_ps;
 							std::cout << std::endl;
 							break;
 						}
