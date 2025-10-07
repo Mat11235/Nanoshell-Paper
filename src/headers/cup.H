@@ -685,7 +685,7 @@ std::complex<double> metal(double ome) {
 			std::cout << std::endl;
 			std::cout << "E0 = " << E0 << " Steady Dip = "<< norm(steady_dip);
 			std::cout << std::endl;
-			std::cout << "E0 = " << E0 << " P3 Dip = "<< norm(*amplitudes[3]);
+			std::cout << "E0 = " << E0 << " P3 Dip = "<< norm(amplitudes[3]);
 			std::cout << std::endl;
 
 			// let's begin without pump
