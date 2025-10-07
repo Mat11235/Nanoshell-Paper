@@ -713,11 +713,7 @@ double *ISS_results(nanosphere ns, double Ome, double ome1, double ome2, double 
         return p3s_shft;
         }
 
-double* simple_intensity_steady_state(nanosphere ns, char* mdl, char* mtl, char* hst, double omemi, double omema, double omeeV, char* sol, double rho) {
-    // Materiales (si los necesitas aquí)
-    double eps3 = ns.set_host(sol);
-    double eps_b= ns.set_host(hst);
-
+double* simple_intensity_steady_state(nanosphere ns, char* mdl, char* hst, double omemi, double omema, double omeeV, char* sol, double rho) {
     // ÚNICA frecuencia: calcula Ω
     double Ome = find_Omega(ns, omeeV, hst, sol, rho);
 
