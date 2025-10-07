@@ -718,10 +718,6 @@ double* simple_intensity_steady_state(nanosphere ns, char* mdl, char* mtl, char*
     double eps3 = ns.set_host(sol);
     double eps_b= ns.set_host(hst);
 
-    // Fröhlich en el rango (opcional; si no lo usas, puedes quitarlo)
-    double* fro = ns.frohlich(omemi, omema, eps_b, eps3, rho);
-    (void)fro; // si solo lo quieres para checks, úsalo; si no, evita el warning
-
     // ÚNICA frecuencia: calcula Ω
     double Ome = find_Omega(ns, omeeV, hst, sol, rho);
 
