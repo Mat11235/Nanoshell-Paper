@@ -398,7 +398,7 @@ double find_Omega1(nanosphere ns, double omeeV, char* hst, char* sol, double rho
     return Ome;
     }
     
-double *ISS_results(nanosphere ns, double Ome, double ome1, double ome2, double omeeV, char* hst, char* sol=0, double rho=0){
+double *ISS_results(nanosphere ns, double Ome, double ome1, double ome2, double omeeV, char* hst, char* sol=0, double rho=0, double E0){
     std::complex<double> GG, OmeH, GamP, OmeP, gam1, gam2, xi, **A, cq0s, *vec, *odv;
     double *res, q0s, p1s, p2s, p3s, N, tau1, tau2, gamd, ome, ome0, *nv;
     std::complex<double>* p0, *p1, *p2, *p3;
@@ -471,13 +471,13 @@ double *ISS_results(nanosphere ns, double Ome, double ome1, double ome2, double 
     vec[2] = gam2;
     vec[3] = {0,0};
     
-    p1s = norm(numerical_output(0, vec, p1))*q0s;
+    p1s = norm(numerical_output(E0, vec, p1))*q0s;
     res[3] = p1s;
     
-    p2s = norm(numerical_output(0, vec, p2))*q0s;
+    p2s = norm(numerical_output(E0, vec, p2))*q0s;
     res[4] = p2s;
     
-    p3s = norm(numerical_output(0, vec, p3))*q0s;
+    p3s = norm(numerical_output(E0, vec, p3))*q0s;
     res[5] = p3s;    
 
     N = 1 - xi.imag()*q0s;
@@ -713,7 +713,7 @@ double *ISS_results(nanosphere ns, double Ome, double ome1, double ome2, double 
         return p3s_shft;
         }
 
-double* simple_intensity_steady_state(nanosphere ns, char* hst, double omeeV, char* sol, double rho) {
+double* simple_intensity_steady_state(nanosphere ns, char* hst, double omeeV, char* sol, double rho, double E0) {
     // ÚNICA frecuencia: calcula Ω
     double Ome = find_Omega(ns, omeeV, hst, sol, rho);
 
@@ -722,7 +722,7 @@ double* simple_intensity_steady_state(nanosphere ns, char* hst, double omeeV, ch
     const double ome2 = +1e9;   // adimensional
 
     // Steady state a esa frecuencia
-    double* res = ISS_results(ns, Ome, ome1, ome2, omeeV, hst, sol, rho);
+    double* res = ISS_results(ns, Ome, ome1, ome2, omeeV, hst, sol, rho, E0);
     return res; // [q0s, |q1|^2, |q2|^2, |p1|^2, |p2|^2, |p3|^2, N]
 }
 
