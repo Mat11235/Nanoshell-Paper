@@ -119,6 +119,86 @@ class nanosphere{
 
 //Terminan las funciones numerical
 
+std::complex<double>* simple_intensity_steady_state(nanosphere* ns, char* mdl, char* mtl, char* hst, double omeeV, char* sol,double rho, double E0){
+    std::complex<double> GG, OmeH, GamP, OmeP, gam1, gam2, xi, **A, cq0s, *vec, *odv;
+    double *res, q0s, p1s, p2s, p3s, N, tau1, tau2, gamd, ome, ome0, ome1, ome2, Ome, *nv;
+    std::complex<double>* p0, *p1, *p2, *p3;
+    double eps_b, eps_s, *fro;
+
+	Ome = find_Omega(*ns, omeeV, hst, sol, rho);
+	ome1 = -1e9;
+	ome2 = +1e9;
+
+    eps_b=ns->set_host(hst);
+    eps_s=ns->set_host(sol);
+    
+    A = new std::complex<double>*[3];
+    for(int i = 0; i <= 2; i++)
+        A[i] = new std::complex<double>[3];
+    
+    nv  = new double[4];
+    odv = new std::complex<double> [3];
+    
+    fro=ns->frohlich(2., 3.4, eps_b, eps_s, rho);
+    // normalized variables
+    nv = ns->normalized_variables ();
+    tau1 = nv[0];
+    tau2 = nv[1];
+    gamd = nv[2];
+    ome0 = nv[3];
+    GG = ns->set_GG(ns->G, tau2);
+    
+    ome  = omeeV/ns->Ome_p;
+
+    odv  = ns->set_ome_dep_vrbls(ome, ome0, tau2, gamd);
+    OmeH = odv[0];
+    OmeP = odv[1];
+    GamP = odv[2];
+    
+    p0 = pcfc0(ns->eps_inf, eps_b, eps_s, rho);
+    p1 = pcfc1(ns->eps_inf, eps_b, eps_s, rho);
+    p2 = pcfc2(ns->eps_inf, eps_b, eps_s, rho);
+    p3 = pcfc3(ns->eps_inf, eps_b, eps_s, rho);
+
+    A   = coefficients(OmeH, OmeP, GG, GamP, p0, p1, p2);
+
+    gam1 = gamma1(A, Ome);
+    gam2 = gamma2(A, Ome);
+    xi   = gimmeXi(p0, gam1, gam2, tau1);
+
+    
+    if (ome<ome1 || ome>ome2){
+        cq0s.real(0);
+        cq0s.imag(0);
+        } else cq0s = 1./xi.imag()+tau1*(OmeH-img*Ome)/(GG*xi*xi.imag());
+    
+    if (fabs(cq0s.imag())>5.e-5 && fabs(ns->G) > fabs(fro[1])){
+        std::cout.precision(20);
+        std::cout<<"> Warning! The error on the imaginary part of |q1|² is larger than 5.e-5"
+        <<std::endl<<"> err = "<<cq0s.imag()<<std::endl;
+        std::cout<<"> ome ="<<omeeV<<", Ome = "<<Ome<<std::endl;
+        } else if (fabs(cq0s.imag())>1. && fabs(ns->G) > fabs(fro[1])){
+            std::cout.precision(20);
+            std::cout<<"> Fatal! The error on the imaginary part of |q1|² is larger than 1"
+            <<std::endl<<"> err = "<<cq0s.imag()<<std::endl;
+            std::cout<<"> ome ="<<omeeV<<", Ome = "<<Ome<<std::endl;
+            exit(-67); 
+            } else q0s = cq0s.real();
+    
+
+	std::complex<double> q0, q1, q2, p3;
+	q0 = std::sqrt(q0s);
+	q1 = gam1*q0;
+	q2 = gam2*q0;
+
+	double p3s = norm(numerical_output(E0, vec, p3))*q0s;
+	p3 = std::sqrt(p3s)
+
+	std::complex<double> qv[4] = {q0,q1,q2,p3};
+
+    return &qv;
+    }
+
 	void set_metal(const char* mtl, const char* mdl, int sel=0){
 	  /** Ome_p [THz]	Plasma frequency (gold)		**/
 	  /** Gam_d [THz]	Drude damping coefficient (gold)**/
