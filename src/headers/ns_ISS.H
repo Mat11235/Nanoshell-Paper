@@ -895,7 +895,7 @@ double *ISS_results(nanosphere* ns, double Ome, double ome1, double ome2, double
     return res;
     }
 
-std::complex<double>* simple_intensity_steady_state(nanosphere* ns, char* mdl, char* mtl, char* hst, double omeeV, char* sol,double rho, double E0){
+std::complex<double> *simple_intensity_steady_state(nanosphere* ns, char* mdl, char* mtl, char* hst, double omeeV, char* sol,double rho, double E0){
     std::complex<double> GG, OmeH, GamP, OmeP, gam1, gam2, xi, **A, cq0s, *vec, *odv;
     double *res, q0s, p1s, p2s, p3s, N, tau1, tau2, gamd, ome, ome0, ome1, ome2, Ome, *nv;
     std::complex<double>* p0, *p1, *p2, *p3;
@@ -922,9 +922,9 @@ std::complex<double>* simple_intensity_steady_state(nanosphere* ns, char* mdl, c
     tau2 = nv[1];
     gamd = nv[2];
     ome0 = nv[3];
-    GG = ns->set_GG(ns.G, tau2);
+    GG = ns->set_GG(ns->G, tau2);
     
-    ome  = omeeV/ns.Ome_p;
+    ome  = omeeV/ns->Ome_p;
 
     odv  = ns->set_ome_dep_vrbls(ome, ome0, tau2, gamd);
     OmeH = odv[0];
@@ -948,12 +948,12 @@ std::complex<double>* simple_intensity_steady_state(nanosphere* ns, char* mdl, c
         cq0s.imag(0);
         } else cq0s = 1./xi.imag()+tau1*(OmeH-img*Ome)/(GG*xi*xi.imag());
     
-    if (fabs(cq0s.imag())>5.e-5 && fabs(ns.G) > fabs(fro[1])){
+    if (fabs(cq0s.imag())>5.e-5 && fabs(ns->G) > fabs(fro[1])){
         std::cout.precision(20);
         std::cout<<"> Warning! The error on the imaginary part of |q1|² is larger than 5.e-5"
         <<std::endl<<"> err = "<<cq0s.imag()<<std::endl;
         std::cout<<"> ome ="<<omeeV<<", Ome = "<<Ome<<std::endl;
-        } else if (fabs(cq0s.imag())>1. && fabs(ns.G) > fabs(fro[1])){
+        } else if (fabs(cq0s.imag())>1. && fabs(ns->G) > fabs(fro[1])){
             std::cout.precision(20);
             std::cout<<"> Fatal! The error on the imaginary part of |q1|² is larger than 1"
             <<std::endl<<"> err = "<<cq0s.imag()<<std::endl;
@@ -970,4 +970,3 @@ std::complex<double>* simple_intensity_steady_state(nanosphere* ns, char* mdl, c
     
     return &qv;
     }
-
