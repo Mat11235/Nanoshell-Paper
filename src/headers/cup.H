@@ -119,7 +119,7 @@ class nanosphere{
 	}
 
 //Terminan las funciones numerical
-metal(const char* mtl, const char* mdl, int sel=0){
+void set_metal(const char* mtl, const char* mdl, int sel=0){
 	  /** Ome_p [THz]	Plasma frequency (gold)		**/
 	  /** Gam_d [THz]	Drude damping coefficient (gold)**/
 	  double *reps, *ieps, la, Dr, Di;
