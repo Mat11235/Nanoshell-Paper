@@ -398,13 +398,13 @@ double find_Omega1(nanosphere ns, double omeeV, char* hst, char* sol, double rho
     return Ome;
     }
     
-double *ISS_results(nanosphere ns, double Ome, double ome1, double ome2, double omeeV, char* hst, char* sol=0, double rho=0, double E0){
+double *ISS_results(nanosphere* ns, double Ome, double ome1, double ome2, double omeeV, char* hst, char* sol=0, double rho=0, double E0){
     std::complex<double> GG, OmeH, GamP, OmeP, gam1, gam2, xi, **A, cq0s, *vec, *odv;
     double *res, q0s, p1s, p2s, p3s, N, tau1, tau2, gamd, ome, ome0, *nv;
     std::complex<double>* p0, *p1, *p2, *p3;
     double eps_b, eps_s, *fro;
-    eps_b=ns.set_host(hst);
-    eps_s=ns.set_host(sol);
+    eps_b=ns->set_host(hst);
+    eps_s=ns->set_host(sol);
 
     res = new double[7];
     vec = new std::complex<double>[4];
@@ -416,18 +416,18 @@ double *ISS_results(nanosphere ns, double Ome, double ome1, double ome2, double 
     nv  = new double[4];
     odv = new std::complex<double> [3];
     
-    fro=ns.frohlich(2., 3.4, eps_b, eps_s, rho);
+    fro=*ns.frohlich(2., 3.4, eps_b, eps_s, rho);
     // normalized variables
     nv = ns.normalized_variables ();
     tau1 = nv[0];
     tau2 = nv[1];
     gamd = nv[2];
     ome0 = nv[3];
-    GG = ns.set_GG(ns.G, tau2);
+    GG = ns->set_GG(ns.G, tau2);
     
     ome  = omeeV/ns.Ome_p;
 
-    odv  = ns.set_ome_dep_vrbls(ome, ome0, tau2, gamd);
+    odv  = ns->set_ome_dep_vrbls(ome, ome0, tau2, gamd);
     OmeH = odv[0];
     OmeP = odv[1];
     GamP = odv[2];
@@ -713,9 +713,9 @@ double *ISS_results(nanosphere ns, double Ome, double ome1, double ome2, double 
         return p3s_shft;
         }
 
-double* simple_intensity_steady_state(nanosphere ns, char* hst, double omeeV, char* sol, double rho, double E0) {
+double* simple_intensity_steady_state(nanosphere* ns, char* hst, double omeeV, char* sol, double rho, double E0) {
     // ÚNICA frecuencia: calcula Ω
-    double Ome = find_Omega(ns, omeeV, hst, sol, rho);
+    double Ome = find_Omega(*ns, omeeV, hst, sol, rho);
 
     // Banda enorme (no recorta)
     const double ome1 = -1e9;   // adimensional
