@@ -23,7 +23,7 @@ tau_characterization: tau_characterization.cxx
 oscillating_electricf: oscillating_electricf.cxx
 	$(CC) $(CFLAGS) oscillating_electricf.cxx -o oscillating_electricf $(LIBS)
 
-electricfieldtest: electric_field_test.cxx
+electric_field_test: electric_field_test.cxx
 	$(CC) $(CFLAGS) electric_field_test.cxx -o electric_field_test $(LIBS)
 
 clean:
