@@ -909,13 +909,13 @@ std::complex<double> metal(double ome) {
 		double eps_b, eps_s, ome, dt;
 		// std::vector<std::complex<double>> wave;
 		int ns=0;
-		int steste=1; //It does change, but it is not required to be on the loop
+		//int steste=1; //It does change, but it is not required to be on the loop
 
 		std::complex<double> eps1e, eps2e, eps1, eps2, alph;
 		double omep, t, tau1, tau2, gamd, ome0, *nv, tildeN, pG = fabs(G);
 		std::complex<double> GG, OmeH, chiH, GamP, OmeP, chiP, **A, *B, *p0, *p1, *p2, *p3, *p, dip, steady_dip, po, *odv;
 		
-		double omeR;
+		//double omeR;
 
 			if ((sol != NULL)) {
 		    eps_s=set_host(sol);
