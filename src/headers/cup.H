@@ -384,12 +384,12 @@ std::complex<double>* simple_intensity_steady_state(char* mdl, char* mtl, char* 
     
     fro=this->frohlich(2., 3.4, eps_b, eps_s, rho);
     // normalized variables
-    nv = this.normalized_variables ();
+    nv = this->normalized_variables ();
     tau1 = nv[0];
     tau2 = nv[1];
     gamd = nv[2];
     ome0 = nv[3];
-    GG = this->set_GG(this.G, tau2);
+    GG = this->set_GG(this->G, tau2);
     
     ome  = omeeV/this->Ome_p;
 
