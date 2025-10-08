@@ -121,8 +121,6 @@ class nanosphere{
 
 //Comienzan funcion de ISS
 
-std::complex<double> img = std::complex<double> (0., 1.);
-
 std::complex<double> gammaD (std::complex<double>** A, double Ome){
     std::complex<double> gamdD = (A[1][1]-img*Ome)*(A[2][2]-img*Ome)-A[1][2]*A[2][1];
     return gamdD;
@@ -144,7 +142,7 @@ std::complex<double> gimmeXi (std::complex<double>* p0, std::complex<double> gam
     return xi;
     }
 
-std::complex<double>* simple_intensity_steady_state( char* mdl, char* mtl, char* hst, double omeeV, char* sol,double rho, double E0){
+std::complex<double>* simple_intensity_steady_state(char* mdl, char* mtl, char* hst, double omeeV, char* sol,double rho, double E0){
     std::complex<double> GG, OmeH, GamP, OmeP, gam1, gam2, xi, **A, cq0s, *vec, *odv;
     double q0s, p3s, tau1, tau2, gamd, ome, ome0, ome1, ome2, Ome, *nv;
     double eps_b, eps_s, *fro;
@@ -154,8 +152,8 @@ std::complex<double>* simple_intensity_steady_state( char* mdl, char* mtl, char*
 	ome1 = -1e9;
 	ome2 = +1e9;
 
-    eps_b=this.set_host(hst);
-    eps_s=this.set_host(sol);
+    eps_b=this->set_host(hst);
+    eps_s=this->set_host(sol);
     
     A = new std::complex<double>*[3];
     for(int i = 0; i <= 2; i++){
@@ -166,26 +164,26 @@ std::complex<double>* simple_intensity_steady_state( char* mdl, char* mtl, char*
     nv  = new double[4];
     odv = new std::complex<double> [3];
     
-    fro=ns->frohlich(2., 3.4, eps_b, eps_s, rho);
+    fro=this->frohlich(2., 3.4, eps_b, eps_s, rho);
     // normalized variables
     nv = this.normalized_variables ();
     tau1 = nv[0];
     tau2 = nv[1];
     gamd = nv[2];
     ome0 = nv[3];
-    GG = this.set_GG(this.G, tau2);
+    GG = this->set_GG(this.G, tau2);
     
-    ome  = omeeV/ns->Ome_p;
+    ome  = omeeV/this->Ome_p;
 
-    odv  = this.set_ome_dep_vrbls(ome, ome0, tau2, gamd);
+    odv  = this->set_ome_dep_vrbls(ome, ome0, tau2, gamd);
     OmeH = odv[0];
     OmeP = odv[1];
     GamP = odv[2];
     
-    p0 = pcfc0(this.eps_inf, eps_b, eps_s, rho);
-    p1 = pcfc1(this.eps_inf, eps_b, eps_s, rho);
-    p2 = pcfc2(this.eps_inf, eps_b, eps_s, rho);
-    p3 = pcfc3(this.eps_inf, eps_b, eps_s, rho);
+    p0 = pcfc0(this->eps_inf, eps_b, eps_s, rho);
+    p1 = pcfc1(this->eps_inf, eps_b, eps_s, rho);
+    p2 = pcfc2(this->eps_inf, eps_b, eps_s, rho);
+    p3 = pcfc3(this->eps_inf, eps_b, eps_s, rho);
 
     A   = coefficients(OmeH, OmeP, GG, GamP, p0, p1, p2);
 
@@ -199,12 +197,12 @@ std::complex<double>* simple_intensity_steady_state( char* mdl, char* mtl, char*
         cq0s.imag(0);
         } else cq0s = 1./xi.imag()+tau1*(OmeH-img*Ome)/(GG*xi*xi.imag());
     
-    if (fabs(cq0s.imag())>5.e-5 && fabs(this.G) > fabs(fro[1])){
+    if (fabs(cq0s.imag())>5.e-5 && fabs(this->G) > fabs(fro[1])){
         std::cout.precision(20);
         std::cout<<"> Warning! The error on the imaginary part of |q1|² is larger than 5.e-5"
         <<std::endl<<"> err = "<<cq0s.imag()<<std::endl;
         std::cout<<"> ome ="<<omeeV<<", Ome = "<<Ome<<std::endl;
-        } else if (fabs(cq0s.imag())>1. && fabs(this.G) > fabs(fro[1])){
+        } else if (fabs(cq0s.imag())>1. && fabs(this->G) > fabs(fro[1])){
             std::cout.precision(20);
             std::cout<<"> Fatal! The error on the imaginary part of |q1|² is larger than 1"
             <<std::endl<<"> err = "<<cq0s.imag()<<std::endl;
@@ -784,7 +782,7 @@ std::complex<double> metal(double ome) {
 		    double frac = double(k) / (Npts - 1);
 		    double E0 = Emin * std::pow(ratio, frac);
 
-			std::complex<double>* amplitudes = simple_intensity_steady_state(this, mdl, mtl, hst, omeeV, sol, rho, E0);
+			std::complex<double>* amplitudes = simple_intensity_steady_state(mdl, mtl, hst, omeeV, sol, rho, E0);
 
 			//Variables that must be initialized once the for loop starts
 			double dnormem=1.e20, dnavr=0, dnavrm=1.e20;
