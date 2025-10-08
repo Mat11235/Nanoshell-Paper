@@ -1,4 +1,3 @@
-@@ -1,251 +0,0 @@
 /*
  * This file is part of the Nano-Shell Simulation Project.
  * 
