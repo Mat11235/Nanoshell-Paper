@@ -729,8 +729,9 @@ std::complex<double>* simple_intensity_steady_state(nanosphere* ns, char* mdl, c
     eps_s=ns->set_host(sol);
     
     A = new std::complex<double>*[3];
-    for(int i = 0; i <= 2; i++)
+    for(int i = 0; i <= 2; i++){
         A[i] = new std::complex<double>[3];
+	}
 
 	vec = new std::complex<double>[4];
     nv  = new double[4];
@@ -796,7 +797,7 @@ std::complex<double>* simple_intensity_steady_state(nanosphere* ns, char* mdl, c
 	p3s = norm(numerical_output(E0, vec, p3))*q0s;
 	p3mod = std::sqrt(p3s);
 
-    auto* out = new std::complex<double>[4]{ q0, q1, q2, dip3 };
+    auto* out = new std::complex<double>[4]{ q0, q1, q2, p3mod };
     return out;
     }
 
