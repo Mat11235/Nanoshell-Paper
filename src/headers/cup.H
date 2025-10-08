@@ -1051,7 +1051,7 @@ std::complex<double> metal(double ome) {
 				delete [] A;
 				delete [] B;
 				
-				dnormem = steste*norm(dip);
+				//dnormem = steste*norm(dip);
 				dip = numerical_output(E0, q, p);
 				alph = dip/E0;
 
@@ -1113,7 +1113,7 @@ std::complex<double> metal(double ome) {
 		}
 		
 // 		std::cout<<"nOme = "<<nOme<<std::endl;
-		wave.clear();
+		//wave.clear();
 		delete [] p0;
 		delete [] p1;
 		delete [] p2;
