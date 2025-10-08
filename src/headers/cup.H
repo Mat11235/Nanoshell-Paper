@@ -1056,7 +1056,7 @@ std::complex<double> metal(double ome) {
 				alph = dip/E0;
 
 				if (t*1.e+12/omep>2.*tpump){
-					if(norm(dip)>=0.9*norm(steady_dip))
+					if(norm(dip)>=0.97*norm(steady_dip))
 					{
 						std::cout << std::endl;
 						std::cout << "E0 = " << E0 << " Dip = " << norm(dip) <<" t = " << t_ps;
