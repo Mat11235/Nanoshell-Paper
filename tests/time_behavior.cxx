@@ -63,11 +63,11 @@ int main(int argc, char** argv) {
  
     fro=simulation.frohlich(omemi, omema, eps_b, eps3, rho);
     // Calculate the saturation electric field Esat
-    double ntau1, ntau2;
-    ntau2 = 2./simulation.Dome;
-    ntau1 = 5.*ntau2;
+    //double ntau1, ntau2;
+    //ntau2 = 2./simulation.Dome;
+    //ntau1 = 5.*ntau2;
 
-    double nEsat = sqrt(1/(fabs(simulation.G)*ntau1));
+    //double nEsat = sqrt(1/(fabs(simulation.G)*ntau1));
     //double nEsatup2 = 1/(fabs(simulation.G)*ntau1);
 
 	
@@ -89,11 +89,11 @@ int main(int argc, char** argv) {
     simulation.analytical(mdl, mtl, hst, E0, omeeV, T, tpump, sol, rho);
     cout << "Running numerical calculation...\n";
     simulation.numerical(mdl, mtl, hst, E0, omeeV, T, tpump, sol, rho);
-	cout<<endl;
-    cout<<" > nEsat    = "<< nEsat <<endl;
-	cout<<endl;
-    cout << "Running probe field loop test...\n";
-    simulation.probetest(mdl, mtl, hst, nEsat, omeeV, tpump, sol, rho);
+	//cout<<endl;
+    //cout<<" > nEsat    = "<< nEsat <<endl;
+	//cout<<endl;
+    //cout << "Running probe field loop test...\n";
+    //simulation.probetest(mdl, mtl, hst, nEsat, omeeV, tpump, sol, rho);
 
     // Output the results
 
