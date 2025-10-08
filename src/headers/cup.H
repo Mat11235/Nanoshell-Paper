@@ -903,11 +903,11 @@ std::complex<double> metal(double ome) {
 	    return Ome;
 	    }
 
-   std::complex<double> probetest(char* mdl , char* mtl ,char* hst, double nEsat, double omeeV, double tpump, char* sol=0, double rho=0){
+     std::complex<double> probetest(char* mdl , char* mtl ,char* hst, double nEsat, double omeeV, double tpump, char* sol=0, double rho=0){
 
 		//Variables that once defined do not change
 		double eps_b, eps_s, ome, dt;
-		std::vector<std::complex<double>> wave;
+		// std::vector<std::complex<double>> wave;
 		int ns=0;
 		int steste=1; //It does change, but it is not required to be on the loop
 
@@ -1056,38 +1056,45 @@ std::complex<double> metal(double ome) {
 				alph = dip/E0;
 
 				if (t*1.e+12/omep>2.*tpump){
-					if (fabs((norm(dip)-dnormem)/norm(dip)) < 1.e-30 && steste==1){ 
-  						//t_stop = t_ps;
+					if(norm(dip)>=0.9*norm(steady_dip))
+					{
 						std::cout << std::endl;
-						//std::cout << " 1st " << "E0 = " << E0 << " " << "t = " << t_ps;
-						std::cout << " 1st " << "E0 = " << E0 << " Dip = " << norm(dip) <<" t = " << t_ps;
+						std::cout << "E0 = " << E0 << " Dip = " << norm(dip) <<" t = " << t_ps;
 						std::cout << std::endl;
 						break;
- 					}
-					if (fabs((norm(dip)-dnormem)/norm(dip)) < 1.e-10) wb=1;
-	// 				if (wb==1 && i%iprint==0){
-					if (wb==1){
-						wave.push_back(q[0]);
-						}
-					if (AVE==0){
-						t0=t;
-						AVE=1;
-						}
-					dpTOT = dpTOT+norm(dip);
-					if (t - t0 >= 1000/omeR) {
-						dnavrm = dnavr;
-						dnavr  = dpTOT / (t - t0);
-						AVE = 0; dpTOT = 0.0;
-
-						double denom2 = std::max(dnavr, 1e-300);
-						if (fabs((dnavr - dnavrm) / denom2) < 1e-7 && steste==1) {
-							std::cout << std::endl;
-							//std::cout << " 2ndst " << "E0 = " << E0 << " " << "t = " << t_ps;
-							std::cout << " 2nd " << "E0 = " << E0 << " Dip = " << norm(dip) <<" t = " << t_ps;
-							std::cout << std::endl;
-							break;
-						}
 					}
+	// 				if (fabs((norm(dip)-dnormem)/norm(dip)) < 1.e-30 && steste==1){ 
+  	// 					//t_stop = t_ps;
+	// 					std::cout << std::endl;
+	// 					//std::cout << " 1st " << "E0 = " << E0 << " " << "t = " << t_ps;
+	// 					std::cout << " 1st " << "E0 = " << E0 << " Dip = " << norm(dip) <<" t = " << t_ps;
+	// 					std::cout << std::endl;
+	// 					break;
+ 	// 				}
+	// 				if (fabs((norm(dip)-dnormem)/norm(dip)) < 1.e-10) wb=1;
+	// // 				if (wb==1 && i%iprint==0){
+	// 				if (wb==1){
+	// 					wave.push_back(q[0]);
+	// 					}
+					// if (AVE==0){
+					// 	t0=t;
+					// 	AVE=1;
+					// 	}
+					// dpTOT = dpTOT+norm(dip);
+					// if (t - t0 >= 1000/omeR) {
+					// 	dnavrm = dnavr;
+					// 	dnavr  = dpTOT / (t - t0);
+					// 	AVE = 0; dpTOT = 0.0;
+
+						// double denom2 = std::max(dnavr, 1e-300);
+						// if (fabs((dnavr - dnavrm) / denom2) < 1e-7 && steste==1) {
+						// 	std::cout << std::endl;
+						// 	//std::cout << " 2ndst " << "E0 = " << E0 << " " << "t = " << t_ps;
+						// 	std::cout << " 2nd " << "E0 = " << E0 << " Dip = " << norm(dip) <<" t = " << t_ps;
+						// 	std::cout << std::endl;
+						// 	break;
+						// }
+					// }
 				  }
 				if (wave.size()>=150000) wave.erase(wave.begin(), wave.begin() +  50000);
 				}
@@ -1096,12 +1103,12 @@ std::complex<double> metal(double ome) {
 				"\t"<<std::setw(13)<<std::setiosflags (std::ios::left)<<E0<<     // 2 E0
 				std::endl;
 
-			if (ns == 1){
-				if (wave.size()>0) nOme=nfindOme(wave.size(), wave, dt);
-					else nOme=0.;
-				}
+			// if (ns == 1){
+			// 	if (wave.size()>0) nOme=nfindOme(wave.size(), wave, dt);
+			// 		else nOme=0.;
+			// 	}
 
-			wave.clear();
+			// wave.clear();
 			delete [] q;
 		}
 		
