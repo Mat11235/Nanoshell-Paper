@@ -397,16 +397,15 @@ double find_Omega1(nanosphere ns, double omeeV, char* hst, char* sol, double rho
             }
     return Ome;
     }
-    
-double *ISS_results(nanosphere ns, double Ome, double ome1, double ome2, double omeeV, char* hst, char* sol=0, double rho=0){
+
+	double *ISS_results(nanosphere ns, double Ome, double ome1, double ome2, double omeeV, char* hst, char* sol=0, double rho=0){
     std::complex<double> GG, OmeH, GamP, OmeP, gam1, gam2, xi, **A, cq0s, *vec, *odv;
     double *res, q0s, p1s, p2s, p3s, N, tau1, tau2, gamd, ome, ome0, *nv;
-    std::complex<double>* p0, p1, p2, p3;
+    std::complex<double>* p0, *p1, *p2, *p3;
     double eps_b, eps_s, *fro;
-    eps_b=ns->set_host(hst);
-    eps_s=ns->set_host(sol);
+    eps_b=ns.set_host(hst);
+    eps_s=ns.set_host(sol);
 
-    res = new double
     res = new double[7];
     vec = new std::complex<double>[4];
     
@@ -488,6 +487,7 @@ double *ISS_results(nanosphere ns, double Ome, double ome1, double ome2, double 
     return res;
     }
 
+
     void complete(std::vector<std::pair<double, double>>& vec, double omemi, double omema, double dome, double value=0.) {
         vec.insert(vec.begin(), std::make_pair(vec[0].first - dome, value));
         vec.insert(vec.begin(), std::make_pair(omemi, value));
@@ -522,7 +522,7 @@ double *ISS_results(nanosphere ns, double Ome, double ome1, double ome2, double 
         ns.G=Gmem;
         return omeB;
         }
-        
+
     std::vector<std::pair<double,double>> intensity_steady_state(nanosphere ns, char* mdl, char* mtl, char* hst, double omemi, double omema, char* sol, double rho, int omeN=1000){
         int omi, ch=1, o1=0, o2=0, oB=0;
         double *res, *fro, omeeV, dome  = (omema-omemi)/omeN, Ome, myOme, Omem=0., ome, shome;
@@ -713,12 +713,13 @@ double *ISS_results(nanosphere ns, double Ome, double ome1, double ome2, double 
                                  "\t\t"<<std::setw(11)<<p3s_shft[i].second<<std::endl;
         return p3s_shft;
         }
-
+        
 
 std::complex<double>* simple_intensity_steady_state(nanosphere* ns, char* mdl, char* mtl, char* hst, double omeeV, char* sol,double rho, double E0){
     std::complex<double> GG, OmeH, GamP, OmeP, gam1, gam2, xi, **A, cq0s, *vec, *odv;
     double q0s, p3s, tau1, tau2, gamd, ome, ome0, ome1, ome2, Ome, *nv;
     double eps_b, eps_s, *fro;
+	std::complex<double> *p0, *p1, *p2, *p3;
 
 	Ome = find_Omega(*ns, omeeV, hst, sol, rho);
 	ome1 = -1e9;
@@ -730,7 +731,8 @@ std::complex<double>* simple_intensity_steady_state(nanosphere* ns, char* mdl, c
     A = new std::complex<double>*[3];
     for(int i = 0; i <= 2; i++)
         A[i] = new std::complex<double>[3];
-    
+
+	vec = new std::complex<double>[4];
     nv  = new double[4];
     odv = new std::complex<double> [3];
     
@@ -781,15 +783,20 @@ std::complex<double>* simple_intensity_steady_state(nanosphere* ns, char* mdl, c
             } else q0s = cq0s.real();
     
 
-	std::complex<double> q0, q1, q2, p3;
+	std::complex<double> q0, q1, q2, p3mod;
 	q0 = std::sqrt(q0s);
 	q1 = gam1*q0;
 	q2 = gam2*q0;
 
+	vec[0] = {1,0};
+    vec[1] = gam1;
+    vec[2] = gam2;
+    vec[3] = {0,0};
+
 	p3s = norm(numerical_output(E0, vec, p3))*q0s;
-	p3 = std::sqrt(p3s)
+	p3mod = std::sqrt(p3s)
 
-	std::complex<double> qv[4] = {q0,q1,q2,p3};
-
-    return &qv[0];
+    auto* out = new std::complex<double>[4]{ q0, q1, q2, dip3 };
+    return out;
     }
+
