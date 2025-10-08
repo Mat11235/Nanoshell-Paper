@@ -729,7 +729,7 @@ std::complex<double> metal(double ome) {
   						//t_stop = t_ps;
 						std::cout << std::endl;
 						//std::cout << " 1st " << "E0 = " << E0 << " " << "t = " << t_ps;
-						std::cout << " 1st " << "E0 = " << E0 << " Dip = " << nomr(dip) <<" t = " << t_ps;
+						std::cout << " 1st " << "E0 = " << E0 << " Dip = " << norm(dip) <<" t = " << t_ps;
 						std::cout << std::endl;
 						break;
  					}
@@ -752,7 +752,7 @@ std::complex<double> metal(double ome) {
 						if (fabs((dnavr - dnavrm) / denom2) < 1e-7 && steste==1) {
 							std::cout << std::endl;
 							//std::cout << " 2ndst " << "E0 = " << E0 << " " << "t = " << t_ps;
-							std::cout << " 2nd " << "E0 = " << E0 << " Dip = " << nomr(dip) <<" t = " << t_ps;
+							std::cout << " 2nd " << "E0 = " << E0 << " Dip = " << norm(dip) <<" t = " << t_ps;
 							std::cout << std::endl;
 							break;
 						}
