@@ -718,7 +718,6 @@ double *ISS_results(nanosphere ns, double Ome, double ome1, double ome2, double 
 std::complex<double>* simple_intensity_steady_state(nanosphere* ns, char* mdl, char* mtl, char* hst, double omeeV, char* sol,double rho, double E0){
     std::complex<double> GG, OmeH, GamP, OmeP, gam1, gam2, xi, **A, cq0s, *vec, *odv;
     double q0s, p3s, tau1, tau2, gamd, ome, ome0, ome1, ome2, Ome, *nv;
-    std::complex<double>* p0, *p1, *p2, *p3;
     double eps_b, eps_s, *fro;
 
 	Ome = find_Omega(*ns, omeeV, hst, sol, rho);
@@ -787,10 +786,10 @@ std::complex<double>* simple_intensity_steady_state(nanosphere* ns, char* mdl, c
 	q1 = gam1*q0;
 	q2 = gam2*q0;
 
-	double p3s = norm(numerical_output(E0, vec, p3))*q0s;
+	p3s = norm(numerical_output(E0, vec, p3))*q0s;
 	p3 = std::sqrt(p3s)
 
 	std::complex<double> qv[4] = {q0,q1,q2,p3};
 
-    return &qv;
+    return &qv[0];
     }
