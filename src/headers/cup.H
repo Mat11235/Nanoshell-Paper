@@ -903,7 +903,7 @@ std::complex<double> metal(double ome) {
 	    return Ome;
 	    }
 
-  std::complex<double> probetest(char* mdl , char* mtl ,char* hst, double nEsat, double omeeV, double tpump, char* sol=0, double rho=0){
+   std::complex<double> probetest(char* mdl , char* mtl ,char* hst, double nEsat, double omeeV, double tpump, char* sol=0, double rho=0){
 
 		//Variables that once defined do not change
 		double eps_b, eps_s, ome, dt;
@@ -1011,7 +1011,8 @@ std::complex<double> metal(double ome) {
 			double N=0;
 			std::complex<double>* q = new std::complex<double>[3]{0.0, 0.0, 0.0};
 			std::complex<double>* Q = new std::complex<double>[3]{amplitudes[0], amplitudes[1], amplitudes[2]};
-			steady_dip = numerical_output(E0, Q, p);
+			std::complex<double>* P = new std::complex<double>[4]{p0, p1, p2, p4};
+			steady_dip = numerical_output(E0, Q, P);
 			std::cout << std::endl;
 			std::cout << "E0 = " << E0 << " Steady Dip = "<< norm(steady_dip);
 			std::cout << std::endl;
@@ -1051,7 +1052,7 @@ std::complex<double> metal(double ome) {
 				delete [] B;
 				
 				dnormem = steste*norm(dip);
-				dip = numerical_output(E0, q, p);
+				dip = numerical_output(E0, q, P);
 				alph = dip/E0;
 
 				if (t*1.e+12/omep>2.*tpump){
