@@ -1011,7 +1011,7 @@ std::complex<double> metal(double ome) {
 			double N=0;
 			std::complex<double>* q = new std::complex<double>[3]{0.0, 0.0, 0.0};
 			std::complex<double>* Q = new std::complex<double>[3]{amplitudes[0], amplitudes[1], amplitudes[2]};
-			std::complex<double>* P = new std::complex<double>[4]{p0, p1, p2, p3};
+			std::complex<double>* P = new std::complex<double>[4]{*p0, *p1, *p2, *p3};
 			steady_dip = numerical_output(E0, Q, P);
 			std::cout << std::endl;
 			std::cout << "E0 = " << E0 << " Steady Dip = "<< norm(steady_dip);
