@@ -1022,7 +1022,7 @@ std::complex<double> metal(double ome) {
 			// let's begin without pump
 			tildeN = 0;
 			
-			omeR = Rabi_frec(G, tau2, E0);
+			//omeR = Rabi_frec(G, tau2, E0);
 			int i=0, pip=0;;
 			//double Tperiod = 50;
 			//double duty = 0.5;
