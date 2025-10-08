@@ -1003,10 +1003,10 @@ std::complex<double> metal(double ome) {
 			std::complex<double>* amplitudes = simple_intensity_steady_state(mdl, mtl, hst, omeeV, sol, rho, E0);
 
 			//Variables that must be initialized once the for loop starts
-			double dnormem=1.e20, dnavr=0, dnavrm=1.e20;
-			int wb=0.;
-			double dpTOT=0, t0=0.0;
-			int AVE=0;
+			//double dnormem=1.e20, dnavr=0, dnavrm=1.e20;
+			//int wb=0.;
+			//double dpTOT=0, t0=0.0;
+			//int AVE=0;
 
 			double N=0;
 			std::complex<double>* q = new std::complex<double>[3]{0.0, 0.0, 0.0};
@@ -1096,7 +1096,7 @@ std::complex<double> metal(double ome) {
 						// }
 					// }
 				  }
-				if (wave.size()>=150000) wave.erase(wave.begin(), wave.begin() +  50000);
+				//if (wave.size()>=150000) wave.erase(wave.begin(), wave.begin() +  50000);
 				}
 
 			dyna<<"  "<<std::setw(8)<<std::setiosflags (std::ios::left)<< t_ps << // 1 time (ps)
