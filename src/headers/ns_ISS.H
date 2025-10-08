@@ -17,6 +17,17 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
+#pragma once
+
+#include <vector>
+#include <utility>
+#include <complex>
+#include <algorithm>
+#include <cmath>
+#include <iomanip>
+#include <fstream>
+#include "nanoshell.H"
+
 std::complex<double> img = std::complex<double> (0., 1.);
 
 std::complex<double> gammaD (std::complex<double>** A, double Ome){
