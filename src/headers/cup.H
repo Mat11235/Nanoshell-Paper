@@ -118,6 +118,120 @@ class nanosphere{
 	}
 
 //Terminan las funciones numerical
+
+//Comienzan funcion de ISS
+
+std::complex<double> img = std::complex<double> (0., 1.);
+
+std::complex<double> gammaD (std::complex<double>** A, double Ome){
+    std::complex<double> gamdD = (A[1][1]-img*Ome)*(A[2][2]-img*Ome)-A[1][2]*A[2][1];
+    return gamdD;
+    }
+
+std::complex<double> gamma1 (std::complex<double>** A, double Ome){
+    std::complex<double> gam1 = (A[1][2]*A[2][0]-A[1][0]*(A[2][2]-img*Ome))/gammaD(A, Ome);
+    return gam1;
+    }
+
+std::complex<double> gamma2 (std::complex<double>** A, double Ome){
+    std::complex<double> gam2 = (A[1][0]*A[2][1]-A[2][0]*(A[1][1]-img*Ome))/gammaD(A, Ome);
+    return gam2;
+    }
+
+    
+std::complex<double> gimmeXi (std::complex<double>* p0, std::complex<double> gam1, std::complex<double> gam2, double tau1){
+    std::complex<double> xi = tau1*(p0[0]+p0[1]*gam1+p0[2]*gam2);
+    return xi;
+    }
+
+std::complex<double>* simple_intensity_steady_state( char* mdl, char* mtl, char* hst, double omeeV, char* sol,double rho, double E0){
+    std::complex<double> GG, OmeH, GamP, OmeP, gam1, gam2, xi, **A, cq0s, *vec, *odv;
+    double q0s, p3s, tau1, tau2, gamd, ome, ome0, ome1, ome2, Ome, *nv;
+    double eps_b, eps_s, *fro;
+	std::complex<double> *p0, *p1, *p2, *p3;
+
+	Ome = find_Omega(*ns, omeeV, hst, sol, rho);
+	ome1 = -1e9;
+	ome2 = +1e9;
+
+    eps_b=this.set_host(hst);
+    eps_s=this.set_host(sol);
+    
+    A = new std::complex<double>*[3];
+    for(int i = 0; i <= 2; i++){
+        A[i] = new std::complex<double>[3];
+	}
+
+	vec = new std::complex<double>[4];
+    nv  = new double[4];
+    odv = new std::complex<double> [3];
+    
+    fro=ns->frohlich(2., 3.4, eps_b, eps_s, rho);
+    // normalized variables
+    nv = this.normalized_variables ();
+    tau1 = nv[0];
+    tau2 = nv[1];
+    gamd = nv[2];
+    ome0 = nv[3];
+    GG = this.set_GG(this.G, tau2);
+    
+    ome  = omeeV/ns->Ome_p;
+
+    odv  = this.set_ome_dep_vrbls(ome, ome0, tau2, gamd);
+    OmeH = odv[0];
+    OmeP = odv[1];
+    GamP = odv[2];
+    
+    p0 = pcfc0(this.eps_inf, eps_b, eps_s, rho);
+    p1 = pcfc1(this.eps_inf, eps_b, eps_s, rho);
+    p2 = pcfc2(this.eps_inf, eps_b, eps_s, rho);
+    p3 = pcfc3(this.eps_inf, eps_b, eps_s, rho);
+
+    A   = coefficients(OmeH, OmeP, GG, GamP, p0, p1, p2);
+
+    gam1 = gamma1(A, Ome);
+    gam2 = gamma2(A, Ome);
+    xi   = gimmeXi(p0, gam1, gam2, tau1);
+
+    
+    if (ome<ome1 || ome>ome2){
+        cq0s.real(0);
+        cq0s.imag(0);
+        } else cq0s = 1./xi.imag()+tau1*(OmeH-img*Ome)/(GG*xi*xi.imag());
+    
+    if (fabs(cq0s.imag())>5.e-5 && fabs(this.G) > fabs(fro[1])){
+        std::cout.precision(20);
+        std::cout<<"> Warning! The error on the imaginary part of |q1|² is larger than 5.e-5"
+        <<std::endl<<"> err = "<<cq0s.imag()<<std::endl;
+        std::cout<<"> ome ="<<omeeV<<", Ome = "<<Ome<<std::endl;
+        } else if (fabs(cq0s.imag())>1. && fabs(this.G) > fabs(fro[1])){
+            std::cout.precision(20);
+            std::cout<<"> Fatal! The error on the imaginary part of |q1|² is larger than 1"
+            <<std::endl<<"> err = "<<cq0s.imag()<<std::endl;
+            std::cout<<"> ome ="<<omeeV<<", Ome = "<<Ome<<std::endl;
+            exit(-67); 
+            } else q0s = cq0s.real();
+    
+
+	std::complex<double> q0, q1, q2, p3mod;
+	q0 = std::sqrt(q0s);
+	q1 = gam1*q0;
+	q2 = gam2*q0;
+
+	vec[0] = {1,0};
+    vec[1] = gam1;
+    vec[2] = gam2;
+    vec[3] = {0,0};
+
+	p3s = norm(numerical_output(E0, vec, p3))*q0s;
+	p3mod = std::sqrt(p3s);
+
+    auto* out = new std::complex<double>[4]{ q0, q1, q2, p3mod };
+    return out;
+    }
+
+//Aqui termina la definicion de las funciones ISS
+
 void set_metal(const char* mtl, const char* mdl, int sel=0){
 	  /** Ome_p [THz]	Plasma frequency (gold)		**/
 	  /** Gam_d [THz]	Drude damping coefficient (gold)**/
