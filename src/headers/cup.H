@@ -142,13 +142,105 @@ std::complex<double> gimmeXi (std::complex<double>* p0, std::complex<double> gam
     return xi;
     }
 
+double find_Omega(double omeeV, char* hst, char* sol=0, double rho=0){
+    std::complex<double> GG, OmeH, GamP, OmeP, **A, *p0, *p1, *p2, gam1, gam2, xi, *vOme, *kap, *odv;
+    double tau1, tau2, gamd, ome, ome0, eps_b, eps_s, *D, **R, **I, *c;
+    double Ome, equ1, equ2, kamp, dmem, *nv;
+    
+    eps_b=this->set_host(hst);
+    eps_s=this->set_host(sol);
+    
+    A = new std::complex<double>*[3];
+    for(int i = 0; i <= 2; i++)
+        A[i] = new std::complex<double>[3];
+
+    c = new double [5];
+
+    D = new double [5];
+
+    R = new double*[3];
+    for(int i = 0; i < 3; i++)
+        R[i] = new double[4];
+
+    I = new double*[3];
+    for(int i = 0; i < 3; i++)
+        I[i] = new double[4];
+
+    vOme = new std::complex<double>[4];
+    kap  = new std::complex<double>[3];
+    nv   = new double[4];
+    odv  = new std::complex<double> [3];
+
+    // normalized variables
+    nv = this->normalized_variables ();
+    tau1 = nv[0];
+    tau2 = nv[1];
+    gamd = nv[2];
+    ome0 = nv[3];
+    GG   = this->set_GG(this->G, tau2);
+
+    ome  = omeeV/this->Ome_p;
+
+    odv  = this->set_ome_dep_vrbls(ome, ome0, tau2, gamd);
+    OmeH = odv[0];
+    OmeP = odv[1];
+    GamP = odv[2];
+    
+    p0 = pcfc0(this->eps_inf, eps_b, eps_s, rho);
+    p1 = pcfc1(this->eps_inf, eps_b, eps_s, rho);
+    p2 = pcfc2(this->eps_inf, eps_b, eps_s, rho);
+
+    A   = coefficients(OmeH, OmeP, GG, GamP, p0, p1, p2);
+        
+    D    = Dsqr(p1[1], p1[2], p2[1], p2[2], ome, gamd);
+    R    = Rnum(p1, p2, ome, gamd);
+    I    = Inum(p1, p2, ome, gamd);
+    c    = cffcOme (D, R, I, p0, tau2, ome, ome0);
+    
+
+    
+    vOme = solve4(c);
+    kap  = eigenvalues(A);
+
+    Ome=0.;
+
+    kamp = 66.;
+    dmem = 0.1;
+    for (int i = 0; i < 3; i++) if (kap[i].real() > 0) kamp = kap[i].imag();
+    if (kamp != 66){
+        for (int i = 0; i < 5; i++){
+            if (vOme[i].imag()==0){
+                if (fabs(vOme[i].real()-kamp)<dmem) {
+                    Ome = vOme[i].real();
+                    dmem = fabs(vOme[i].real()-kamp);         
+                    }
+                }
+            }
+        }   
+    gam1 = gamma1(A, Ome);
+    gam2 = gamma2(A, Ome);
+    xi   = gimmeXi(p0, gam1, gam2, tau1);
+    equ1 = norm(gammaD(A, Ome))*(real(xi)+tau2*(Ome-ome+ome0)*imag(xi))/tau1;
+    equ2 = c[0]+c[1]*Ome+c[2]*pow(Ome,2)+c[3]*pow(Ome,3)+c[4]*pow(Ome,4);
+    if (abs(equ1-equ2)>=1.e-18 && fabs(Ome)> 1.e-30){
+        std::cout.precision(20);
+        std::cout<<"> Fatal! The error on the coefficient equation is larger than "<<abs(equ1-equ2)<<std::endl;
+        std::cout<<"> ome ="<<omeeV<<std::endl;
+        exit(-66);
+        }
+    
+    
+    
+    return Ome;
+    }
+
 std::complex<double>* simple_intensity_steady_state(char* mdl, char* mtl, char* hst, double omeeV, char* sol,double rho, double E0){
     std::complex<double> GG, OmeH, GamP, OmeP, gam1, gam2, xi, **A, cq0s, *vec, *odv;
     double q0s, p3s, tau1, tau2, gamd, ome, ome0, ome1, ome2, Ome, *nv;
     double eps_b, eps_s, *fro;
 	std::complex<double> *p0, *p1, *p2, *p3;
 
-	Ome = find_Omega(*ns, omeeV, hst, sol, rho);
+	Ome = find_Omega(omeeV, hst, sol, rho);
 	ome1 = -1e9;
 	ome2 = +1e9;
 
