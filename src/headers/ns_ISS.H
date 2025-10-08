@@ -401,7 +401,7 @@ double find_Omega1(nanosphere ns, double omeeV, char* hst, char* sol, double rho
 double *ISS_results(nanosphere ns, double Ome, double ome1, double ome2, double omeeV, char* hst, char* sol=0, double rho=0){
     std::complex<double> GG, OmeH, GamP, OmeP, gam1, gam2, xi, **A, cq0s, *vec, *odv;
     double *res, q0s, p1s, p2s, p3s, N, tau1, tau2, gamd, ome, ome0, *nv;
-    std::complex<double>* p0, *p1, *p2, *p3;
+    std::complex<double>* p0, p1, p2, p3;
     double eps_b, eps_s, *fro;
     eps_b=ns->set_host(hst);
     eps_s=ns->set_host(sol);
