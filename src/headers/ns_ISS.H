@@ -794,7 +794,7 @@ std::complex<double>* simple_intensity_steady_state(nanosphere* ns, char* mdl, c
     vec[3] = {0,0};
 
 	p3s = norm(numerical_output(E0, vec, p3))*q0s;
-	p3mod = std::sqrt(p3s)
+	p3mod = std::sqrt(p3s);
 
     auto* out = new std::complex<double>[4]{ q0, q1, q2, dip3 };
     return out;
