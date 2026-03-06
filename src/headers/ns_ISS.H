@@ -226,6 +226,7 @@ std::vector<std::pair<double,std::complex<double>>> gimme_emi_kap(nanosphere ns,
         return vkamp;
         }
 
+        //Usar esto para encontrar omega grande, que es la emision, calcular omega grande y omega pequeno
 double find_Omega(nanosphere ns, double omeeV, char* hst, char* sol=0, double rho=0){
     std::complex<double> GG, OmeH, GamP, OmeP, **A, *p0, *p1, *p2, gam1, gam2, xi, *vOme, *kap, *odv;
     double tau1, tau2, gamd, ome, ome0, eps_b, eps_s, *D, **R, **I, *c;
@@ -524,7 +525,7 @@ double find_Omega1(nanosphere ns, double omeeV, char* hst, char* sol, double rho
         return omeB;
         }
 
-    std::vector<std::pair<double,double>> intensity_steady_state(nanosphere ns, char* mdl, char* mtl, char* hst, double omemi, double omema, char* sol, double rho, int omeN=1000){
+  std::vector<std::pair<double,double>> intensity_steady_state(nanosphere ns, char* mdl, char* mtl, char* hst, double omemi, double omema, char* sol, double rho, int omeN=1000){
         int omi, ch=1, o1=0, o2=0, oB=0;
         double *res, *fro, omeeV, dome  = (omema-omemi)/omeN, Ome, myOme, Omem=0., ome, shome;
         double ome1, ome2;

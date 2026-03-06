@@ -3,7 +3,7 @@ CFLAGS = -Wall -I../src/headers -L../src/lib
 LIBS = -lgsl -lgslcblas -lm -larmadillo
 
 # List of test programs
-TARGETS = time_behavior threshold steady_state tau_characterization oscillating_electricf electric_field_test
+TARGETS = time_behavior threshold steady_state tau_characterization oscillating_electricf electric_field_test frequency_test
 
 # Define how to build each target
 all: $(TARGETS)
@@ -25,6 +25,9 @@ oscillating_electricf: oscillating_electricf.cxx
 
 electric_field_test: electric_field_test.cxx
 	$(CC) $(CFLAGS) electric_field_test.cxx -o electric_field_test $(LIBS)
+
+frequency_test: frequency_test.cxx
+	$(CC) $(CFLAGS) frequency_test.cxx -o frequency_test $(LIBS)
 
 clean:
 	rm -f $(TARGETS)

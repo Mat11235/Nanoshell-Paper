@@ -69,6 +69,10 @@ int main(int argc, char** argv) {
     cout << "Running probe field loop test...\n";
     simulation.probetest(mdl, mtl, hst, nEsat, omeeV, tpump, sol, rho);
 
+
+    cout << "Running final loop test...\n";
+    simulation.probetest_N(mdl, mtl, hst, nEsat, omeeV, tpump, sol, rho);
+
     // Output the results
 
     // Save the results to a file

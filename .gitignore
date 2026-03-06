@@ -9,6 +9,7 @@ bin/*
 !data/output/.gitkeep
 !data/output/oGp/.gitkeep
 !data/output/rho/.gitkeep
+!data/output/probetime.dat
 !img/.gitkeep
 !bin/.gitkeep
 
