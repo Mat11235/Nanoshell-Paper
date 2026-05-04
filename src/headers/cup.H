@@ -23,7 +23,7 @@
 #define eV2erg 1.60217657e-12
 #define erg2eV 6.24150932e11
 
-//Para la impresion de tau1, tau2
+//For printing tau1, tau2
 
 #define hbar 1.0545718e-34       // [J·s]
 #define ps 1e12                  // 1 ps = 1e-12 s
@@ -33,11 +33,6 @@ double eV2nm(double ome){
   lam=cc/(ome*eV2j/h)*1.e9;
   return lam;
   }
-
-  struct OmegaPoint {
-    double t_ps;    // tiempo donde paraste (ps)
-    double dip_ss;  // |dip| (o el valor que quieras)
-};
 
 class nanosphere{
     private:
@@ -67,7 +62,9 @@ class nanosphere{
 	  pi = acos(-1.);
 	  }
 
-//Introduccion de funciones numerical
+// Put this into a separate file
+	// Pump functions
+//----------------------------------------------------------------------------------------------------------------------------------------------
 	void dflt(double* tildeN, double t_ps, double tpump, int* pip){
 		if(t_ps >= tpump && *pip ==0) {
 			*tildeN = 1.;
@@ -79,36 +76,37 @@ class nanosphere{
 	
 	void squarewave(double* tildeN, double Tperiod, double duty, double t_ps, double tpump, std::complex<double>* GG, double G, double tau2){
 		if (t_ps >= tpump) {
-			    // onda cuadrada: tildeN = 1 durante el pulso, luego 0
-			    double local_t = fmod(t_ps - tpump, Tperiod);
-			    if (local_t < duty * Tperiod) {
-			        *tildeN = 1.;  // bomba encendida
+			// Square wave: tildeN = 1 during the pulse, then 0
+			double local_t = fmod(t_ps - tpump, Tperiod);
+			if (local_t < duty * Tperiod) {
+				*tildeN = 1.;  // pump ON
 				//*GG = set_GG(0.1414, tau2);
-			    } else {
-			        *tildeN = 0;  // bomba apagada
-			    *GG = set_GG(G, tau2);
-			    }
 			} else {
-			    *tildeN = 0;  // antes de tpump, no hay bomba
+				*tildeN = 0;  // pump OFF
+				*GG = set_GG(G, tau2);
 			}
+		} else {
+			*tildeN = 0;  // before tpump, there is no pump
+		}
 	}
 
 	void sinusoidalwave(double* tildeN, double Tperiod, double t_ps, std::complex<double>* GG, double G, double tau2) {
-	     //Rango [0,1] y N(0)=0
+	     //Range [0,1] and N(0)=0
 	    *tildeN = 0.5 * (1.0 - std::cos(2.0 * M_PI * t_ps / Tperiod));
-	     //(equivalente a 0.5*(1 + sin(2π t/T - π/2)))
+	     //(equivalent to 0.5*(1 + sin(2π t/T - π/2)))
 	}
 
-		    // if (*tildeN > 0.6) {
-	    //     *GG = set_GG(0.15, tau2);
-	    // } else {
-	    //     *GG = set_GG(G, tau2);
-	    // }
+//----------------------------------------------------------------------------------------------------------------------------------------------
 
-//Terminan las funciones numerical
 
-//Comienzan funcion de ISS
+// This block of code contains some functions originally defined in ns_ISS.H.
+// Due to referencing issues, they were directly included in cup.H.
+// Additionally, in earlier stages, parts of this code were used to obtain the maximum emission dipole under the small-field approximation (those are commented just in case it get useful on the future)
+	// ns_ISS.H functions
+//----------------------------------------------------------------------------------------------------------------------------------------------
 
+	//Using the notation used on nanophotonics, the function find_Omega finds Big Omega
+	//----------------------------------------------------------------------------------------------------------------------------------------------
 std::complex<double> gammaD (std::complex<double>** A, double Ome){
     std::complex<double> gamdD = (A[1][1]-img*Ome)*(A[2][2]-img*Ome)-A[1][2]*A[2][1];
     return gamdD;
@@ -216,8 +214,6 @@ double find_Omega(double omeeV, char* hst, char* sol=0, double rho=0){
         std::cout<<"> ome ="<<omeeV<<std::endl;
         exit(-66);
         }
-    
-    
     
     return Ome;
     }
@@ -347,94 +343,97 @@ double *cffcOme (double *D, double **R, double **I, std::complex<double>* p0, do
 
     return c;
     }
+	//----------------------------------------------------------------------------------------------------------------------------------------------
+	// This function provides the maximum dipole approximation in the small-signal regime.
 
-std::complex<double>* simple_intensity_steady_state(char* mdl, char* mtl, char* hst, double omeeV, char* sol,double rho, double E0){
-    std::complex<double> GG, OmeH, GamP, OmeP, gam1, gam2, xi, **A, cq0s, *vec, *odv;
-    double q0s, p3s, tau1, tau2, gamd, ome, ome0, ome1, ome2, Ome, *nv;
-    double eps_b, eps_s, *fro;
-	std::complex<double> *p0, *p1, *p2, *p3;
+// std::complex<double>* simple_intensity_steady_state(char* mdl, char* mtl, char* hst, double omeeV, char* sol,double rho, double E0){
+//     std::complex<double> GG, OmeH, GamP, OmeP, gam1, gam2, xi, **A, cq0s, *vec, *odv;
+//     double q0s, p3s, tau1, tau2, gamd, ome, ome0, ome1, ome2, Ome, *nv;
+//     double eps_b, eps_s, *fro;
+// 	std::complex<double> *p0, *p1, *p2, *p3;
 
-	Ome = find_Omega(omeeV, hst, sol, rho);
-	ome1 = -1e9;
-	ome2 = +1e9;
+// 	Ome = find_Omega(omeeV, hst, sol, rho);
+// 	ome1 = -1e9;
+// 	ome2 = +1e9;
 
-    eps_b=this->set_host(hst);
-    eps_s=this->set_host(sol);
+//     eps_b=this->set_host(hst);
+//     eps_s=this->set_host(sol);
     
-    A = new std::complex<double>*[3];
-    for(int i = 0; i <= 2; i++){
-        A[i] = new std::complex<double>[3];
-	}
+//     A = new std::complex<double>*[3];
+//     for(int i = 0; i <= 2; i++){
+//         A[i] = new std::complex<double>[3];
+// 	}
 
-	vec = new std::complex<double>[4];
-    nv  = new double[4];
-    odv = new std::complex<double> [3];
+// 	vec = new std::complex<double>[4];
+//     nv  = new double[4];
+//     odv = new std::complex<double> [3];
     
-    fro=this->frohlich(2., 3.4, eps_b, eps_s, rho);
-    // normalized variables
-    nv = this->normalized_variables ();
-    tau1 = nv[0];
-    tau2 = nv[1];
-    gamd = nv[2];
-    ome0 = nv[3];
-    GG = this->set_GG(this->G, tau2);
+//     fro=this->frohlich(2., 3.4, eps_b, eps_s, rho);
+//     // normalized variables
+//     nv = this->normalized_variables ();
+//     tau1 = nv[0];
+//     tau2 = nv[1];
+//     gamd = nv[2];
+//     ome0 = nv[3];
+//     GG = this->set_GG(this->G, tau2);
     
-    ome  = omeeV/this->Ome_p;
+//     ome  = omeeV/this->Ome_p;
 
-    odv  = this->set_ome_dep_vrbls(ome, ome0, tau2, gamd);
-    OmeH = odv[0];
-    OmeP = odv[1];
-    GamP = odv[2];
+//     odv  = this->set_ome_dep_vrbls(ome, ome0, tau2, gamd);
+//     OmeH = odv[0];
+//     OmeP = odv[1];
+//     GamP = odv[2];
     
-    p0 = pcfc0(this->eps_inf, eps_b, eps_s, rho);
-    p1 = pcfc1(this->eps_inf, eps_b, eps_s, rho);
-    p2 = pcfc2(this->eps_inf, eps_b, eps_s, rho);
-    p3 = pcfc3(this->eps_inf, eps_b, eps_s, rho);
+//     p0 = pcfc0(this->eps_inf, eps_b, eps_s, rho);
+//     p1 = pcfc1(this->eps_inf, eps_b, eps_s, rho);
+//     p2 = pcfc2(this->eps_inf, eps_b, eps_s, rho);
+//     p3 = pcfc3(this->eps_inf, eps_b, eps_s, rho);
 
-    A   = coefficients(OmeH, OmeP, GG, GamP, p0, p1, p2);
+//     A   = coefficients(OmeH, OmeP, GG, GamP, p0, p1, p2);
 
-    gam1 = gamma1(A, Ome);
-    gam2 = gamma2(A, Ome);
-    xi   = gimmeXi(p0, gam1, gam2, tau1);
+//     gam1 = gamma1(A, Ome);
+//     gam2 = gamma2(A, Ome);
+//     xi   = gimmeXi(p0, gam1, gam2, tau1);
 
     
-    if (ome<ome1 || ome>ome2){
-        cq0s.real(0);
-        cq0s.imag(0);
-        } else cq0s = 1./xi.imag()+tau1*(OmeH-img*Ome)/(GG*xi*xi.imag());
+//     if (ome<ome1 || ome>ome2){
+//         cq0s.real(0);
+//         cq0s.imag(0);
+//         } else cq0s = 1./xi.imag()+tau1*(OmeH-img*Ome)/(GG*xi*xi.imag());
     
-    if (fabs(cq0s.imag())>5.e-5 && fabs(this->G) > fabs(fro[1])){
-        std::cout.precision(20);
-        std::cout<<"> Warning! The error on the imaginary part of |q1|² is larger than 5.e-5"
-        <<std::endl<<"> err = "<<cq0s.imag()<<std::endl;
-        std::cout<<"> ome ="<<omeeV<<", Ome = "<<Ome<<std::endl;
-        } else if (fabs(cq0s.imag())>1. && fabs(this->G) > fabs(fro[1])){
-            std::cout.precision(20);
-            std::cout<<"> Fatal! The error on the imaginary part of |q1|² is larger than 1"
-            <<std::endl<<"> err = "<<cq0s.imag()<<std::endl;
-            std::cout<<"> ome ="<<omeeV<<", Ome = "<<Ome<<std::endl;
-            exit(-67); 
-            } else q0s = cq0s.real();
+//     if (fabs(cq0s.imag())>5.e-5 && fabs(this->G) > fabs(fro[1])){
+//         std::cout.precision(20);
+//         std::cout<<"> Warning! The error on the imaginary part of |q1|² is larger than 5.e-5"
+//         <<std::endl<<"> err = "<<cq0s.imag()<<std::endl;
+//         std::cout<<"> ome ="<<omeeV<<", Ome = "<<Ome<<std::endl;
+//         } else if (fabs(cq0s.imag())>1. && fabs(this->G) > fabs(fro[1])){
+//             std::cout.precision(20);
+//             std::cout<<"> Fatal! The error on the imaginary part of |q1|² is larger than 1"
+//             <<std::endl<<"> err = "<<cq0s.imag()<<std::endl;
+//             std::cout<<"> ome ="<<omeeV<<", Ome = "<<Ome<<std::endl;
+//             exit(-67); 
+//             } else q0s = cq0s.real();
     
 
-	std::complex<double> q0, q1, q2, p3mod;
-	q0 = std::sqrt(q0s);
-	q1 = gam1*q0;
-	q2 = gam2*q0;
+// 	std::complex<double> q0, q1, q2, p3mod;
+// 	q0 = std::sqrt(q0s);
+// 	q1 = gam1*q0;
+// 	q2 = gam2*q0;
 
-	vec[0] = {1,0};
-    vec[1] = gam1;
-    vec[2] = gam2;
-    vec[3] = {0,0};
+// 	vec[0] = {1,0};
+//     vec[1] = gam1;
+//     vec[2] = gam2;
+//     vec[3] = {0,0};
 
-	p3s = norm(numerical_output(E0, vec, p3))*q0s;
-	p3mod = std::sqrt(p3s);
+// 	p3s = norm(numerical_output(E0, vec, p3))*q0s;
+// 	p3mod = std::sqrt(p3s);
 
-    auto* out = new std::complex<double>[4]{ q0, q1, q2, p3mod };
-    return out;
-    }
+//     auto* out = new std::complex<double>[4]{ q0, q1, q2, p3mod };
+//     return out;
+//     }
 
-//Aqui termina la definicion de las funciones ISS
+//----------------------------------------------------------------------------------------------------------------------------------------------
+
 
 void set_metal(const char* mtl, const char* mdl, int sel=0){
 	  /** Ome_p [THz]	Plasma frequency (gold)		**/
@@ -712,7 +711,7 @@ std::complex<double> metal(double ome) {
 		return odv;
 		}
 		
-	std::vector<std::pair<double,std::complex<double>>>  steady_state(char* mdl , char* mtl ,char* hst ,double omemi, double omema, int omeN=10000, char* sol=0, double rho=0){
+	std::vector<std::pair<double,std::complex<double>>> steady_state(char* mdl , char* mtl ,char* hst ,double omemi, double omema, int omeN=10000, char* sol=0, double rho=0){
 	    int omi, ns=0;
 	    double eps_b, eps_s, ome, omeeV, dome  = (omema-omemi)/omeN;
 
@@ -891,410 +890,7 @@ std::complex<double> metal(double ome) {
 	    return Ome;
 	    }
 
-// 	std::complex<double> omegatest(char* mdl , char* mtl ,char* hst, double nEsat, double omeeV, double tpump, double E0, std::fstream& file, char* sol=0, double rho=0){
-
-// 		//Variables that once defined do not change
-// 		double eps_b, eps_s, ome, dt;
-// 		// std::vector<std::complex<double>> wave;
-// 		int ns=0;
-// 		//int steste=1; //It does change, but it is not required to be on the loop
-
-// 		std::complex<double> eps1e, eps2e, eps1, eps2, alph;
-// 		double omep, t, tau1, tau2, gamd, ome0, *nv, tildeN, pG = fabs(G);
-// 		std::complex<double> GG, OmeH, chiH, GamP, OmeP, chiP, **A, *B, *p0, *p1, *p2, *p3, *p, dip, steady_dip, po, *odv;
-		
-// 		//double omeR;
-
-// 			if ((sol != NULL)) {
-// 		    eps_s=set_host(sol);
-// 		    ns=1;
-// 		    }
-// 		    else eps_s=0;
-// 		eps_b=set_host(hst);
-
-// 		A = new std::complex<double>*[3];
-// 		for(int i = 0; i <= 2; i++)
-// 		    A[i] = new std::complex<double>[3];
-		
-// 		B = new std::complex<double>[3];
-
-
-// 		nv = new double[4];
-
-// 		odv = new std::complex<double> [3];
-
-// 		// std::fstream dyna;
-// 		// dyna.open("../data/output/probetime.dat", std::ios::out);
-		
-		
-// 		// dyna<<"# * PROBETEST * "<<std::endl;
-// 		// dyna<<"#"<<std::endl;
-// 		// dyna<<"# file generated by ** cup.H ** "<<std::endl;
-// 		// dyna<<"#"<<std::endl;
-// 		// dyna<<"# PARAMETERS: "<<std::endl;
-// 		// dyna<<"# G = "<<pG<<std::endl;
-// 		// dyna<<"# ome = "<<omeeV<<" eV"<<std::endl;
-// 		// dyna<<"# a "<<mdl<<" model was used for "<<mtl<<std::endl;
-// 		// dyna<<"# ------------- "<<std::endl;
-// 		// dyna<<"# t (ps)\t E0"<<std::endl;
-// 		// dyna<<"#"<<std::endl;
-
-// 		omep = eV2j*Ome_p*2.*M_PI/h;
-// 		// normalized variables
-// 		nv = normalized_variables ();
-// 		tau1 = nv[0];
-// 		tau2 = nv[1];
-// 		gamd = nv[2];
-// 		ome0 = nv[3];
-// 		GG = set_GG(G, tau2);
-
-		
-// 		p0 = pcfc0(ceps_inf, eps_b, eps_s, rho);
-// 		p1 = pcfc1(ceps_inf, eps_b, eps_s, rho);
-// 		p2 = pcfc2(ceps_inf, eps_b, eps_s, rho);
-// 		p3 = pcfc3(ceps_inf, eps_b, eps_s, rho);
-// 		if (ns == 1) p=p3;
-// 		    else p=p0;
-
-// 		ome = omeeV/Ome_p;
-
-// 		odv  = set_ome_dep_vrbls(ome, ome0, tau2, gamd);
-		
-// 		OmeH = odv[0];
-// 		OmeP = odv[1];
-// 		GamP = odv[2];
-
-// 		chiH = -GG/OmeH;
-// 		chiP = -GamP/OmeP;
-		
-// 		eps1e = eps_inf + chiP;
-// 		eps2e = eps_b   + chiH;
-
-// 		double T=100000*omep*1.e-12; // in ome_p
-
-// 		// Initial conditions
-// 		dt  = 1.;
-// 		//double t_stop = 0.0;
-
-// 		int Nt=T/dt;
-		
-// 		std::complex<double>* amplitudes = simple_intensity_steady_state(mdl, mtl, hst, omeeV, sol, rho, E0);
-
-// 		//Variables that must be initialized once the for loop starts
-// 		// double dnormem=1.e20, dnavr=0, dnavrm=1.e20;
-// 		// int wb=0.;
-// 		// double dpTOT=0, t0=0.0;
-// 		// int AVE=0;
-
-// 		double N=0;
-// 		std::complex<double>* q = new std::complex<double>[3]{0.0, 0.0, 0.0};
-// 		std::complex<double>* Q = new std::complex<double>[3]{amplitudes[0], amplitudes[1], amplitudes[2]};
-
-// 		steady_dip = numerical_output(E0, Q, p);
-// 		// std::cout << std::endl;
-// 		// std::cout << "E0 = " << E0 << " Steady Dip = "<< norm(steady_dip);
-// 		// std::cout << std::endl;
-// 		// std::cout << "E0 = " << E0 << " P3 Dip = "<< norm(amplitudes[3]);
-// 		// std::cout << std::endl;
-
-// 		// let's begin without pump
-// 		tildeN = 0;
-		
-// 		//omeR = Rabi_frec(G, tau2, E0);
-// 		int i=0, pip=0;;
-// 		//double Tperiod = 50;
-// 		//double duty = 0.5;
-// 		double t_ps;
-
-
-// 		while (i<=Nt){// && (fabs(norm(dip)-dnormem)> 1.e-20 || t*1.e+12/omep<12*tpump)){
-// 			t=i*dt;
-// 			i++;
-
-// 			//Introduccion de una onda cuadrada para el bombeo
-// 			t_ps    = t * 1.e+12 / omep;  // tiempo actual en ps
-// 			dflt(&tildeN, t_ps, tpump, &pip);
-// 			//squarewave(&tildeN, Tperiod, duty, t_ps,tpump, &GG, G, tau2);
-// 			//sinusoidalwave(&tildeN, Tperiod, t_ps, &GG, G, tau2);
-
-// 			if (ns == 1) {
-// 				po  = numerical_output(E0, q, p0);
-// 				N   = Runge_Kutta_mono_4 (N, -1./tau1, tildeN/tau1+imag(q[0]*conj(po)), dt);
-// 				} else N = 1;
-// 			A   = coefficients(OmeH, OmeP, GG*N, GamP, p0, p1, p2); 
-// 			B   = inhomogeneous(GG*N, GamP, E0, p0, p1, p2);
-// 			q   = Runge_Kutta_4 (q, A, B, dt);
-			
-// 			for(int ix = 0; ix <= 2; ix++) delete [] A[ix];
-// 			delete [] A;
-// 			delete [] B;
-			
-// 			//dnormem = steste*norm(dip);
-// 			dip = numerical_output(E0, q, p);
-// 			alph = dip/E0;
-
-// 			if (t*1.e+12/omep>2.*tpump){
-// 				if(norm(dip)>=0.9*norm(steady_dip))
-// 				{
-// 					// std::cout << std::endl;
-// 					// std::cout << "E0 = " << E0 << " Dip = " << norm(dip) <<" t = " << t_ps;
-// 					// std::cout << std::endl;
-// 					break;
-// 				}
-// // 				if (fabs((norm(dip)-dnormem)/norm(dip)) < 1.e-30 && steste==1){ 
-// // 					//t_stop = t_ps;
-// // 					std::cout << std::endl;
-// // 					//std::cout << " 1st " << "E0 = " << E0 << " " << "t = " << t_ps;
-// // 					std::cout << " 1st " << "E0 = " << E0 << " Dip = " << norm(dip) <<" t = " << t_ps;
-// // 					std::cout << std::endl;
-// // 					break;
-// // 				}
-// // 				if (fabs((norm(dip)-dnormem)/norm(dip)) < 1.e-10) wb=1;
-// // // 				if (wb==1 && i%iprint==0){
-// // 				if (wb==1){
-// // 					wave.push_back(q[0]);
-// // 					}
-// 				// if (AVE==0){
-// 				// 	t0=t;
-// 				// 	AVE=1;
-// 				// 	}
-// 				// dpTOT = dpTOT+norm(dip);
-// 				// if (t - t0 >= 1000/omeR) {
-// 				// 	dnavrm = dnavr;
-// 				// 	dnavr  = dpTOT / (t - t0);
-// 				// 	AVE = 0; dpTOT = 0.0;
-
-// 					// double denom2 = std::max(dnavr, 1e-300);
-// 					// if (fabs((dnavr - dnavrm) / denom2) < 1e-7 && steste==1) {
-// 					// 	std::cout << std::endl;
-// 					// 	//std::cout << " 2ndst " << "E0 = " << E0 << " " << "t = " << t_ps;
-// 					// 	std::cout << " 2nd " << "E0 = " << E0 << " Dip = " << norm(dip) <<" t = " << t_ps;
-// 					// 	std::cout << std::endl;
-// 					// 	break;
-// 					// }
-// 				// }
-// 				}
-// 			//if (wave.size()>=150000) wave.erase(wave.begin(), wave.begin() +  50000);
-// 			}
-
-// 		file<<"  "<<std::setw(8)<<std::setiosflags (std::ios::left)<< t_ps << // 1 time (ps)
-// 			"\t"<<std::setw(13)<<std::setiosflags (std::ios::left)<<omeeV<<     // 2 E0
-// 			std::endl;
-
-// 		// if (ns == 1){
-// 		// 	if (wave.size()>0) nOme=nfindOme(wave.size(), wave, dt);
-// 		// 		else nOme=0.;
-// 		// 	}
-
-// 		// wave.clear();
-// 		delete [] q;
-
-		
-// // 		std::cout<<"nOme = "<<nOme<<std::endl;
-// 		//wave.clear();
-// 		delete [] p0;
-// 		delete [] p1;
-// 		delete [] p2;
-// 		delete [] p3;
-
-// 		return dip;
-// 		}	
-
-    // std::complex<double> enhancednumerical(char* mdl , char* mtl ,char* hst, double E0, double omeeV, double tpump, char* sol=0, double rho=0)
-	// {
-
-	// 	double eps_b, eps_s, ome, dt;
-	// 	int ns = 0;
-	// 	int steste = 0;   // para el criterio viejo
-
-	// 	std::complex<double> eps1e, eps2e, eps1, eps2, alph;
-	// 	double omep, t, tau1, tau2, gamd, ome0, *nv, tildeN;
-	// 	std::complex<double> GG, OmeH, chiH, GamP, OmeP, chiP;
-	// 	std::complex<double> **A, *B, *p0, *p1, *p2, *p3, *p, dip, po, *odv;
-
-	// 	if (sol != NULL) {
-	// 		eps_s = set_host(sol);
-	// 		ns    = 1;
-	// 	} else {
-	// 		eps_s = 0;
-	// 	}
-	// 	eps_b = set_host(hst);
-
-	// 	omep = eV2j * Ome_p * 2. * M_PI / h;
-
-	// 	nv   = normalized_variables();
-	// 	tau1 = nv[0];
-	// 	tau2 = nv[1];
-	// 	gamd = nv[2];
-	// 	ome0 = nv[3];
-	// 	GG   = set_GG(G, tau2);
-
-	// 	p0 = pcfc0(ceps_inf, eps_b, eps_s, rho);
-	// 	p1 = pcfc1(ceps_inf, eps_b, eps_s, rho);
-	// 	p2 = pcfc2(ceps_inf, eps_b, eps_s, rho);
-	// 	p3 = pcfc3(ceps_inf, eps_b, eps_s, rho);
-	// 	p  = (ns == 1 ? p3 : p0);
-
-    // 	std::fstream dyna;
-
-    //     dyna.open("../data/output/numtime.dat", std::ios::out);
-		
-	// 	dyna<<"# * NUMERICAL * "<<std::endl;
-	// 	dyna<<"#"<<std::endl;
-	// 	dyna<<"# file generated by ** cup.H ** "<<std::endl;
-	// 	dyna<<"#"<<std::endl;
-	// 	dyna<<"# PARAMETERS: "<<std::endl;
-	// 	dyna<<"# G = "<<G<<std::endl;
-	// 	dyna<<"# ome = "<<omeeV<<" eV"<<std::endl;
-	// 	// dyna<<"# BigOme = " << BigOme << " ,ome_em = " << omeeV - BigOme*Ome_p << " ,omeeV/Ome_p = " << omeeV/Ome_p <<std::endl;
-	// 	dyna<<"# a "<<mdl<<" model was used for "<<mtl<<std::endl;
-	// 	dyna<<"# ------------- "<<std::endl;
-	// 	dyna<<"# t (ps)\treal(alph)\timag(alph)\treal(dip)\timag(dip)"<<std::endl;
-	// 	dyna<<"#"<<std::endl;
-
-
-	// 	ome  = omeeV / Ome_p;
-	// 	odv  = set_ome_dep_vrbls(ome, ome0, tau2, gamd);
-	// 	OmeH = odv[0];
-	// 	OmeP = odv[1];
-	// 	GamP = odv[2];
-
-	// 	chiH  = -GG / OmeH;
-	// 	chiP  = -GamP / OmeP;
-	// 	eps1e = eps_inf + chiP;
-	// 	eps2e = eps_b   + chiH;
-
-	// 	double T = 147000 * omep * 1.e-12; // en unidades de ome_p
-	// 	dt  = 1.0;
-	// 	int Nt = (int)std::ceil(T / dt);
-
-	// 	int Nprint = (Nt > 50000 ? 50000 : Nt);
-	// 	if (Nprint < 1) Nprint = 1;
-	// 	int iprint = Nt / Nprint;
-	// 	if (iprint < 1) iprint = 1;
-
-
-	// 	double N = 0.0;
-	// 	std::complex<double>* q = new std::complex<double>[3]{0.0, 0.0, 0.0};
-
-	// 	// Para el criterio de convergencia viejo
-	// 	double dnormem = 1.e20, dnavr = 0.0, dnavrm = 1.e20;
-
-	// 	double dpTOT   = 0.0, t0 = 0.0;
-	// 	int    AVE     = 0;
-	// 	double omeR    = Rabi_frec(G, tau2, E0);
-
-	// 	tildeN = 0.0;
-	// 	int i   = 0;
-	// 	int pip = 0;
-	// 	double t_ps  = 0.0;
-	// 	double dip_ss = 0.0;   // aquí guardaremos el dipolo estacionario
-	// 	double tol = 1e-30;   // o 1e-12 si quieres más estricto
-	// 	double newdt = 2*dt;
-
-	// 	while (i <= Nt) {
-	// 		t = i*newdt;
-	// 		i++;
-
-	// 		t_ps = t * 1.e+12 / omep;
-	// 		dflt(&tildeN, t_ps, tpump, &pip);
-
-	// 		if (ns == 1) {
-	// 			po = numerical_output(E0, q, p0);
-	// 			N  = Runge_Kutta_mono_4(
-	// 					N,
-	// 					-1./tau1,
-	// 					tildeN/tau1 + imag(q[0]*conj(po)),
-	// 					newdt);
-	// 		} else {
-	// 			N = 1;
-	// 		}
-
-	// 		A = coefficients(OmeH, OmeP, GG*N, GamP, p0, p1, p2);
-	// 		B = inhomogeneous(GG*N, GamP, E0, p0, p1, p2);
-	// 		q = Runge_Kutta_4(q, A, B, newdt);
-
-	// 		for (int ix = 0; ix < 3; ++ix)
-	// 			delete [] A[ix];
-	// 		delete [] A;
-	// 		delete [] B;
-
-	// 		// --- criterio viejo: usar variación relativa de |dip| ---
-	// 		dnormem = steste * std::norm(dip);  // |dip|^2 previo
-	// 		dip     = numerical_output(E0, q, p);
-	// 		alph    = dip / E0;
-	// 		dip_ss = std::sqrt(std::norm(dip));
-	// 		if(i%iprint==0){
-	// 			dyna<<"  "<<std::setw(8)<<std::setiosflags (std::ios::left)<<t/omep*1.e+12<< // 1 time (ps)
-	// 				"\t"<<std::setw(13)<<std::setiosflags (std::ios::left)<<real(alph)<<     // 2 Re(alpha)
-	// 				"\t"<<std::setw(13)<<std::setiosflags (std::ios::left)<<imag(alph)<<     // 3 Im(alpha)
-	// 				"\t"<<std::setw(13)<<std::setiosflags (std::ios::left)<<real(dip)<<     // 4 Re(dip)
-	// 				"\t"<<std::setw(13)<<std::setiosflags (std::ios::left)<<imag(dip)<<     // 5 Im(dip)
-	// 				"\t"<<std::setw(13)<<std::setiosflags (std::ios::left)<<dip_ss<<             // 6 dip_ss
-	// 				"\t"<<std::setw(13)<<std::setiosflags (std::ios::left)<<N<<             // 6 N
-	// 				"\t"<<std::setw(13)<<std::setiosflags (std::ios::left)<<real(po)<<      // 7 Re(p0)
-	// 				"\t"<<std::setw(13)<<std::setiosflags (std::ios::left)<<imag(po)<<      // 8 Im(p0) 
-	// 				std::endl;
-	// 			}
-
-	// 		if (t * 1.e+12 / omep > 2. * tpump) {
-
-	// 			double nd = std::norm(dip);
-	// 			if (nd > 0.0) {
-	// 				if (std::fabs((nd - dnormem) / nd) < tol && steste==1) break;
-	// 			}
-
-	// 			if (AVE == 0) {
-	// 				t0  = t;
-	// 				AVE = 1;
-	// 			}
-
-	// 			dpTOT += norm(dip);
-
-	// 			if (t - t0 >= 1000 / omeR) {
-	// 				dnavrm = dnavr;
-	// 				dnavr  = dpTOT / (t - t0);
-	// 				AVE    = 0;
-	// 				dpTOT  = 0.0;
-
-	// 				if ( fabs((dnavr - dnavrm) / dnavr) < 1.e-7
-	// 					&& steste == 1 ) {
-	// 					// std::cout << std::endl;
-	// 					// std::cout << " 2nd omeeV = " << omeeV
-	// 					// 		<< " Dip = " << dip_ss
-	// 					// 		<< " t = "   << t_ps;
-	// 					// std::cout << std::endl;
-	// 					break;
-	// 				}
-	// 			}
-
-	// 			// if (i >= Nt_guard) {
-	// 			// 	std::cout << "WARN: no convergio para omeeV=" << omeeV
-	// 			// 			<< " en T=" << t_ps << " ps\n";
-	// 			// 	std::cout << std::endl;
-	// 			// 		std::cout << " WARN omeeV = " << omeeV
-	// 			// 				<< " Dip = " << dip_ss
-	// 			// 				<< " t = "   << t_ps;
-	// 			// 		std::cout << std::endl;
-	// 			// 	break;
-	// 			// }
-
-	// 		}
-	// 	} // fin while
-
-	// 	delete [] q;
-	// 	delete [] odv;
-	// 	delete [] p0;
-	// 	delete [] p1;
-	// 	delete [] p2;
-	// 	delete [] p3;
-	// 	delete [] nv;
-
-
-	// 	return dip;
-	// }
-
-	std::complex<double> omegatest(
+	std::complex<double> freqtest_first(
 		char* mdl , char* mtl ,char* hst,
 		double nEsat, double tpump,
 		double E0, double ome1, double ome2,
@@ -1303,7 +899,7 @@ std::complex<double> metal(double ome) {
 
 		double eps_b, eps_s, ome, dt;
 		int ns = 0;
-		int steste = 1;   // para el criterio viejo
+		int steste = 1;   // for the old criteria
 
 		std::complex<double> eps1e, eps2e, eps1, eps2;
 		double omep, t, tau1, tau2, gamd, ome0, *nv, tildeN;
@@ -1333,18 +929,24 @@ std::complex<double> metal(double ome) {
 		p3 = pcfc3(ceps_inf, eps_b, eps_s, rho);
 		p  = (ns == 1 ? p3 : p0);
 
-		// Número de frecuencias en el barrido:
-		int Nfreq = 6;
+		// Number of frequencies in the sweep
+		int Nfreq = 30;
+
+		// Initialize the variable before using it
 		double omeeV = 0;
 
-		// Paso en frecuencia (eV)
-		double center = ome_0;         // centro deseado
-        //std::cout << "omemi = " << ome1*Ome_p << ", omemax = " << ome2*Ome_p << std::endl;
+		// In case it is necessary to inspect the interval limits
+		// std::cout << "omemin = " << ome1*Ome_p << ", omemax = " << ome2*Ome_p << std::endl;
+		// ome1 and ome2 correspond to the minimum and maximum emission bounds, respectively
 
-		//double fix = ome1*Ome_p + 0.04;
-		//double space = fabs(center-fix)/3;
-		double omemin = center - 0.01;
-		double omemax = center + 0.01;
+		// Avoid using the exact interval boundaries for the sweep,since convergence becomes slower toward the extremes
+
+		// Frequency step (eV)
+		// double center = ome_0;   // desired sweep center
+
+		// Sweep limits
+		double omemin = ome1 * Ome_p + 0.1;
+		double omemax = ome2 * Ome_p - 0.1;
 
 
 		double dome = (omemax - omemin) / (Nfreq - 1);
@@ -1352,7 +954,7 @@ std::complex<double> metal(double ome) {
 
     	std::fstream dyna;
 
-        dyna.open("../data/output/numtime.dat", std::ios::out);
+        dyna.open("../data/output/temporary.dat", std::ios::out);
 		
 
 		dyna<<"# * FREQUENCY TEST * "<<std::endl;
@@ -1384,33 +986,35 @@ std::complex<double> metal(double ome) {
 			eps1e = eps_inf + chiP;
 			eps2e = eps_b   + chiH;
 
-			double T = 10000 * omep * 1.e-12; // en unidades de ome_p
+			double T = 10000 * omep * 1.e-12; // in units of Ome_p
 			dt  = 1.;
 			int Nt = T / dt;
 
 			double N = 0.0;
 			std::complex<double>* q = new std::complex<double>[3]{0.0, 0.0, 0.0};
 
-			// Para el criterio de convergencia viejo
+			// Variables for the previous convergence criterion
 			double dnormem = 1.e20, dnavr = 0.0, dnavrm = 1.e20;
 
 			double dpTOT   = 0.0, t0 = 0.0;
 			int    AVE     = 0;
 			double omeR    = Rabi_frec(G, tau2, E0);
 
+			// Initialize variables prior to the loop
 			tildeN = 0.0;
 			int i   = 0;
 			int pip = 0;
 			double t_ps  = 0.0;
-			double dip_ss = 0.0;   // aquí guardaremos el dipolo estacionario
+			double dip_ss = 0.0;   // steady-state dipole value
 
-			const int Nt_guard = (int)(1*Nt); // ejemplo: 20% extra, tú decides
+			const int Nt_guard = (int)(1 * Nt); // safety margin on iteration count (user-defined)
 
 			while (i <= Nt) {
 				t = i * dt;
                 i++;
 
 				t_ps = t * 1.e+12 / omep;
+				//Pump function
 				dflt(&tildeN, t_ps, tpump, &pip);
 
 				if (ns == 1) {
@@ -1434,21 +1038,20 @@ std::complex<double> metal(double ome) {
 				delete [] B;
 
 
-				dnormem = steste * std::norm(dip);  // |dip|^2 previo
+				dnormem = steste * std::norm(dip);
 				dip     = numerical_output(E0, q, p);
-				// --- criterio viejo: usar variación relativa de |dip| ---
 				dip_ss = std::sqrt(std::norm(dip));
 
 				if (t * 1.e+12 / omep > 2. * tpump) {
 
-					// 1) cambio relativo muy pequeño: estado estacionario alcanzado
 					if ( fabs((norm(dip) - dnormem) / norm(dip)) < 1.e-30
 						&& steste == 1 ) {
-						std::cout << std::endl;
-						std::cout << " 1st  omeeV = " << omeeV
-								<< " Dip = " << dip_ss
-								<< " t = "   << t_ps;
-						std::cout << std::endl;
+						// Uncomment this block if you want to print the exit values
+						// std::cout << std::endl;
+						// std::cout << " 1st  omeeV = " << omeeV
+						//           << " Dip = " << dip_ss
+						//           << " t = "   << t_ps;
+						// std::cout << std::endl;
 						break;
 					}
 
@@ -1467,28 +1070,30 @@ std::complex<double> metal(double ome) {
 
 						if ( fabs((dnavr - dnavrm) / dnavr) < 1.e-7
 							&& steste == 1 ) {
-							std::cout << std::endl;
-							std::cout << " 2nd omeeV = " << omeeV
-									<< " Dip = " << dip_ss
-									<< " t = "   << t_ps;
-							std::cout << std::endl;
+							// Uncomment this block if you want to print the exit values
+							// std::cout << std::endl;
+							// std::cout << " 2nd omeeV = " << omeeV
+							// 		<< " Dip = " << dip_ss
+							// 		<< " t = "   << t_ps;
+							// std::cout << std::endl;
 							break;
 						}
 					}
-
+					
+					// Safety check to avoid infinite loops
 					if (i >= Nt_guard) {
-						std::cout << "WARN: no convergio para omeeV=" << omeeV
-								<< " en T=" << t_ps << " ps\n";
+						std::cout << "WARN: did not converge for omeeV=" << omeeV
+								<< " at T=" << t_ps << " ps\n";
 						std::cout << std::endl;
-							std::cout << " WARN omeeV = " << omeeV
-									<< " Dip = " << dip_ss
-									<< " t = "   << t_ps;
-							std::cout << std::endl;
+						std::cout << " WARN omeeV = " << omeeV
+								<< " Dip = " << dip_ss
+								<< " t = "   << t_ps;
+						std::cout << std::endl;
 						break;
 					}
 
 				}
-			} // fin while
+			} // end of while
 			dyna << "  " << std::setw(13) << std::setiosflags(std::ios::left) << omeeV
 			<< "\t" << std::setw(13) << std::setiosflags(std::ios::left) << dip_ss
 			<< std::endl;
@@ -1506,12 +1111,13 @@ std::complex<double> metal(double ome) {
 		return dip;
 	}
 
-		std::complex<double> omegatest_N(
+		std::complex<double> freqtest_second(
 		char* mdl , char* mtl ,char* hst,
 		double nEsat, double tpump,
 		double E0, double ome1, double ome2,
 		char* sol, double rho)
 	{
+
 		double eps_b, eps_s, ome, dt;
 		int ns = 0;
 
@@ -1545,20 +1151,25 @@ std::complex<double> metal(double ome) {
 
 		double omeeV =0, pss=0;
 		std::vector<double> omeeV_list, pss_list;
+		
+		// Here we read the file written in the first loop and store the values in vectors
+		std::ifstream steady("../data/output/temporary.dat");
 
-		std::ifstream steady("../data/output/numtime.dat");
 		std::string line;
 		while (std::getline(steady, line)) {
-			if (line.size() == 0 || line[0] == '#') continue; // saltar comentarios
+			if (line.size() == 0 || line[0] == '#') continue; // skip comments
+
 			std::stringstream ss(line);
 			ss >> omeeV >> pss;
+
 			omeeV_list.push_back(omeeV);
 			pss_list.push_back(pss);
 		}
+
 		steady.close();
 
 		std::fstream dyna;
-        dyna.open("../data/output/probetime.dat", std::ios::out);
+        dyna.open("../data/output/omegatest.dat", std::ios::out);
 		
 
 		dyna<<"# * FREQUENCY TEST * "<<std::endl;
@@ -1593,13 +1204,14 @@ std::complex<double> metal(double ome) {
 			eps1e = eps_inf + chiP;
 			eps2e = eps_b   + chiH;
 
-			double T = 10000 * omep * 1.e-12; // en unidades de ome_p
+			double T = 10000 * omep * 1.e-12; // in units of Ome_p
 			dt  = 1.;
 			int Nt = T/dt;
 
 			double N = 0;
 			std::complex<double>* q = new std::complex<double>[3]{0.0, 0.0, 0.0};
-
+			
+			// Initialize variables prior to the loop
 			tildeN = 0.0;
 			int i   = 0;
 			int pip = 0;
@@ -1608,13 +1220,14 @@ std::complex<double> metal(double ome) {
 			Bigome = find_Omega(omeeV, hst, sol, rho);
 			ome_em = omeeV - Bigome*Ome_p;
 
-			const int Nt_guard = (int)(1*Nt); // ejemplo: 20% extra, tú decides
+			const int Nt_guard = (int)(1*Nt); // safety margin on iteration count (user-defined)
 			
 			while (i <= Nt) {
 				t = i * dt;
 				i++;
 
 				t_ps = t * 1.e+12 / omep;
+				//Pump function
 				dflt(&tildeN, t_ps, tpump, &pip);
 
 				if (ns == 1) {
@@ -1634,18 +1247,18 @@ std::complex<double> metal(double ome) {
 
 				dip  = numerical_output(E0, q, p);
 				double mod_dip = std::sqrt(std::norm(dip));
-
-				//Numero complejo
 				
 				if (t*1.e+12/omep > 2.*tpump) {
 					if (mod_dip >= 0.9*pss) {
-						std::cout << std::endl;
-						std::cout << "omeeV = " << omeeV << " Dip = " << pss << " 0.9Dip = "<< mod_dip <<" t = " << t_ps;
-						std::cout << std::endl;
+						// Uncomment this block if you want to print the exit values
+						// std::cout << std::endl;
+						// std::cout << "omeeV = " << omeeV << " Dip = " << pss << " 0.9Dip = "<< mod_dip <<" t = " << t_ps;
+						// std::cout << std::endl;
 						break;
 					}
 				}
-
+				
+				// Safety check to avoid infinite loops
 				if (i >= Nt_guard) {
 						std::cout << "WARN: no convergio para omeeV=" << omeeV
 								<< " en T=" << t_ps << " ps\n";
@@ -1680,244 +1293,21 @@ std::complex<double> metal(double ome) {
 		return dip;
 	}
 
-
-//      std::complex<double> probetest(char* mdl , char* mtl ,char* hst, double nEsat, double omeeV, double tpump, char* sol=0, double rho=0){
-
-// 		//Variables that once defined do not change
-// 		double eps_b, eps_s, ome, dt;
-// 		// std::vector<std::complex<double>> wave;
-// 		int ns=0;
-// 		//int steste=1; //It does change, but it is not required to be on the loop
-
-// 		std::complex<double> eps1e, eps2e, eps1, eps2, alph;
-// 		double omep, t, tau1, tau2, gamd, ome0, *nv, tildeN, pG = fabs(G);
-// 		std::complex<double> GG, OmeH, chiH, GamP, OmeP, chiP, **A, *B, *p0, *p1, *p2, *p3, *p, dip, steady_dip, po, *odv;
-		
-// 		//double omeR;
-
-// 			if ((sol != NULL)) {
-// 		    eps_s=set_host(sol);
-// 		    ns=1;
-// 		    }
-// 		    else eps_s=0;
-// 		eps_b=set_host(hst);
-
-// 		A = new std::complex<double>*[3];
-// 		for(int i = 0; i <= 2; i++)
-// 		    A[i] = new std::complex<double>[3];
-		
-// 		B = new std::complex<double>[3];
-
-
-// 		nv = new double[4];
-
-// 		odv = new std::complex<double> [3];
-
-// 		std::fstream dyna;
-// 		dyna.open("../data/output/probetime.dat", std::ios::out);
-		
-		
-// 		dyna<<"# * PROBETEST * "<<std::endl;
-// 		dyna<<"#"<<std::endl;
-// 		dyna<<"# file generated by ** cup.H ** "<<std::endl;
-// 		dyna<<"#"<<std::endl;
-// 		dyna<<"# PARAMETERS: "<<std::endl;
-// 		dyna<<"# G = "<<pG<<std::endl;
-// 		dyna<<"# ome = "<<omeeV<<" eV"<<std::endl;
-// 		dyna<<"# a "<<mdl<<" model was used for "<<mtl<<std::endl;
-// 		dyna<<"# ------------- "<<std::endl;
-// 		dyna<<"# t (ps)\t E0"<<std::endl;
-// 		dyna<<"#"<<std::endl;
-
-// 		omep = eV2j*Ome_p*2.*M_PI/h;
-// 		// normalized variables
-// 		nv = normalized_variables ();
-// 		tau1 = nv[0];
-// 		tau2 = nv[1];
-// 		gamd = nv[2];
-// 		ome0 = nv[3];
-// 		GG = set_GG(G, tau2);
-
-		
-// 		p0 = pcfc0(ceps_inf, eps_b, eps_s, rho);
-// 		p1 = pcfc1(ceps_inf, eps_b, eps_s, rho);
-// 		p2 = pcfc2(ceps_inf, eps_b, eps_s, rho);
-// 		p3 = pcfc3(ceps_inf, eps_b, eps_s, rho);
-// 		if (ns == 1) p=p3;
-// 		    else p=p0;
-
-// 		ome = omeeV/Ome_p;
-
-// 		odv  = set_ome_dep_vrbls(ome, ome0, tau2, gamd);
-		
-// 		OmeH = odv[0];
-// 		OmeP = odv[1];
-// 		GamP = odv[2];
-
-// 		chiH = -GG/OmeH;
-// 		chiP = -GamP/OmeP;
-		
-// 		eps1e = eps_inf + chiP;
-// 		eps2e = eps_b   + chiH;
-
-// 		double T=100000*omep*1.e-12; // in ome_p
-
-// 		// Initial conditions
-// 		dt  = 1.;
-// 		//double t_stop = 0.0;
-
-// 		int Nt=T/dt;
-
-// 		//Introduction of the for-loop
-// 		const int Npts = 100;
-// 		const double Emin = 1e-15 * nEsat;
-// 		const double Emax = 1e-2  * nEsat;
-// 		const double ratio = Emax / Emin;
-
-// 		for (int k = 0; k < Npts; ++k) {
-// 		    double frac = double(k) / (Npts - 1);
-// 		    double E0 = Emin * std::pow(ratio, frac);
-
-// 			std::complex<double>* amplitudes = simple_intensity_steady_state(mdl, mtl, hst, omeeV, sol, rho, E0);
-
-// 			//Variables that must be initialized once the for loop starts
-// 			//double dnormem=1.e20, dnavr=0, dnavrm=1.e20;
-// 			//int wb=0.;
-// 			//double dpTOT=0, t0=0.0;
-// 			//int AVE=0;
-
-// 			double N=0;
-// 			std::complex<double>* q = new std::complex<double>[3]{0.0, 0.0, 0.0};
-// 			std::complex<double>* Q = new std::complex<double>[3]{amplitudes[0], amplitudes[1], amplitudes[2]};
-
-// 			steady_dip = numerical_output(E0, Q, p);
-// 			std::cout << std::endl;
-// 			std::cout << "E0 = " << E0 << " Steady Dip = "<< norm(steady_dip);
-// 			std::cout << std::endl;
-// 			std::cout << "E0 = " << E0 << " P3 Dip = "<< norm(amplitudes[3]);
-// 			std::cout << std::endl;
-
-// 			// let's begin without pump
-// 			tildeN = 0;
-			
-// 			//omeR = Rabi_frec(G, tau2, E0);
-// 			int i=0, pip=0;;
-// 			//double Tperiod = 50;
-// 			//double duty = 0.5;
-//             double t_ps;
-
-
-// 			while (i<=Nt){// && (fabs(norm(dip)-dnormem)> 1.e-20 || t*1.e+12/omep<12*tpump)){
-// 				t=i*dt;
-// 				i++;
-
-// 				//Introduccion de una onda cuadrada para el bombeo
-// 				t_ps    = t * 1.e+12 / omep;  // tiempo actual en ps
-// 				dflt(&tildeN, t_ps, tpump, &pip);
-// 				//squarewave(&tildeN, Tperiod, duty, t_ps,tpump, &GG, G, tau2);
-// 				//sinusoidalwave(&tildeN, Tperiod, t_ps, &GG, G, tau2);
-
-// 				if (ns == 1) {
-// 					po  = numerical_output(E0, q, p0);
-// 					N   = Runge_Kutta_mono_4 (N, -1./tau1, tildeN/tau1+imag(q[0]*conj(po)), dt);
-// 					} else N = 1;
-// 				A   = coefficients(OmeH, OmeP, GG*N, GamP, p0, p1, p2); 
-// 				B   = inhomogeneous(GG*N, GamP, E0, p0, p1, p2);
-// 				q   = Runge_Kutta_4 (q, A, B, dt);
-				
-// 				for(int ix = 0; ix <= 2; ix++) delete [] A[ix];
-// 				delete [] A;
-// 				delete [] B;
-				
-// 				//dnormem = steste*norm(dip);
-// 				dip = numerical_output(E0, q, p);
-// 				alph = dip/E0;
-
-// 				if (t*1.e+12/omep>2.*tpump){
-// 					if(norm(dip)>=0.9*norm(steady_dip))
-// 					{
-// 						std::cout << std::endl;
-// 						std::cout << "E0 = " << E0 << " Dip = " << norm(dip) <<" t = " << t_ps;
-// 						std::cout << std::endl;
-// 						break;
-// 					}
-// 	// 				if (fabs((norm(dip)-dnormem)/norm(dip)) < 1.e-30 && steste==1){ 
-//   	// 					//t_stop = t_ps;
-// 	// 					std::cout << std::endl;
-// 	// 					//std::cout << " 1st " << "E0 = " << E0 << " " << "t = " << t_ps;
-// 	// 					std::cout << " 1st " << "E0 = " << E0 << " Dip = " << norm(dip) <<" t = " << t_ps;
-// 	// 					std::cout << std::endl;
-// 	// 					break;
-//  	// 				}
-// 	// 				if (fabs((norm(dip)-dnormem)/norm(dip)) < 1.e-10) wb=1;
-// 	// // 				if (wb==1 && i%iprint==0){
-// 	// 				if (wb==1){
-// 	// 					wave.push_back(q[0]);
-// 	// 					}
-// 					// if (AVE==0){
-// 					// 	t0=t;
-// 					// 	AVE=1;
-// 					// 	}
-// 					// dpTOT = dpTOT+norm(dip);
-// 					// if (t - t0 >= 1000/omeR) {
-// 					// 	dnavrm = dnavr;
-// 					// 	dnavr  = dpTOT / (t - t0);
-// 					// 	AVE = 0; dpTOT = 0.0;
-
-// 						// double denom2 = std::max(dnavr, 1e-300);
-// 						// if (fabs((dnavr - dnavrm) / denom2) < 1e-7 && steste==1) {
-// 						// 	std::cout << std::endl;
-// 						// 	//std::cout << " 2ndst " << "E0 = " << E0 << " " << "t = " << t_ps;
-// 						// 	std::cout << " 2nd " << "E0 = " << E0 << " Dip = " << norm(dip) <<" t = " << t_ps;
-// 						// 	std::cout << std::endl;
-// 						// 	break;
-// 						// }
-// 					// }
-// 				  }
-// 				//if (wave.size()>=150000) wave.erase(wave.begin(), wave.begin() +  50000);
-// 				}
-
-// 			dyna<<"  "<<std::setw(8)<<std::setiosflags (std::ios::left)<< t_ps << // 1 time (ps)
-// 				"\t"<<std::setw(13)<<std::setiosflags (std::ios::left)<<E0<<     // 2 E0
-// 				std::endl;
-
-// 			// if (ns == 1){
-// 			// 	if (wave.size()>0) nOme=nfindOme(wave.size(), wave, dt);
-// 			// 		else nOme=0.;
-// 			// 	}
-
-// 			// wave.clear();
-// 			delete [] q;
-// 		}
-		
-// // 		std::cout<<"nOme = "<<nOme<<std::endl;
-// 		//wave.clear();
-// 		delete [] p0;
-// 		delete [] p1;
-// 		delete [] p2;
-// 		delete [] p3;
-
-// 		return dip;
-// 		}
-
-
-
-	std::complex<double> probetest(char* mdl , char* mtl ,char* hst,
+	std::complex<double> probetest_first(char* mdl , char* mtl ,char* hst,
 								double nEsat, double omeeV, double tpump,
 								char* sol, double rho)
 	{
-		// Variables que no cambian dentro del bucle en E0
+	
 		double eps_b, eps_s, ome, dt;
-		std::vector<std::complex<double>> wave;
+
 		int ns = 0;
-		int steste = 1;  // necesario para el criterio viejo
+		int steste = 1;  // required for the previous convergence criterion
 
 		std::complex<double> eps1e, eps2e, eps1, eps2, alph;
 		double omep, dip_ss, t, tau1, tau2, gamd, ome0, *nv, tildeN, pG = fabs(G);
 		std::complex<double> GG, OmeH, chiH, GamP, OmeP, chiP;
 		std::complex<double> **A, *B, *p0, *p1, *p2, *p3, *p, dip, po, *odv;
 
-		// Host, metal, etc.
 		if (sol != NULL) {
 			eps_s = set_host(sol);
 			ns    = 1;
@@ -1934,9 +1324,8 @@ std::complex<double> metal(double ome) {
 		nv  = new double[4];
 		odv = new std::complex<double>[3];
 
-		// Archivo de salida global del probetest
 		std::fstream dyna;
-		dyna.open("../data/output/numtime.dat", std::ios::out);
+		dyna.open("../data/output/temporary.dat", std::ios::out);
 
 		dyna << "# * PROBETEST * " << std::endl;
 		dyna << "#" << std::endl;
@@ -1950,7 +1339,6 @@ std::complex<double> metal(double ome) {
 		dyna << "# E0\t Max Dip\t t" << std::endl;
 		dyna << "#" << std::endl;
 
-		// Normalización de frecuencias, etc.
 		omep = eV2j * Ome_p * 2. * M_PI / h;
 		nv   = normalized_variables();
 		tau1 = nv[0];
@@ -1976,11 +1364,12 @@ std::complex<double> metal(double ome) {
 		eps1e = eps_inf + chiP;
 		eps2e = eps_b   + chiH;
 
-		double T = 100000 * omep * 1.e-12; // en unidades de ome_p
+		double T = 100000 * omep * 1.e-12; // in units of Ome_p
 		dt = 1.;
 		int Nt = T / dt;
 
-		// ---- Barrido en E0 (logarítmico) ----
+		// ---- Sweep over E0 (logarithmic) ----
+		// If you want to vhange the range of the sweep, then you have to change Emax and Emin
 		const int    Npts  = 500;
 		const double Emin  = 1e-15 * nEsat;
 		const double Emax  = nEsat;
@@ -1991,9 +1380,8 @@ std::complex<double> metal(double ome) {
 			double frac = double(k) / (Npts - 1);
 			double E0   = Emin * std::pow(ratio, frac);
 
-			// Variables del criterio de convergencia (viejo) — se reinician por cada E0
+			// Variables for the (old) convergence criterion — reset for each E0
 			double dnormem = 1.e20, dnavr = 0.0, dnavrm = 1.e20;
-			int    wb      = 0;
 			double dpTOT   = 0.0, t0 = 0.0;
 			int    AVE     = 0;
 			double omeR    = Rabi_frec(G, tau2, E0);
@@ -2001,7 +1389,7 @@ std::complex<double> metal(double ome) {
 			double N = 0.0;
 			std::complex<double>* q = new std::complex<double>[3]{0.0, 0.0, 0.0};
 
-			// empezamos sin bombeo
+			// Initialize variables prior to the loop
 			tildeN = 0.0;
 			int    i   = 0;
 			int    pip = 0;
@@ -2011,10 +1399,8 @@ std::complex<double> metal(double ome) {
 				t = i * dt;
 				i++;
 
-				// tiempo en ps
 				t_ps = t * 1.e+12 / omep;
-
-				// bombeo
+				//Pump function
 				dflt(&tildeN, t_ps, tpump, &pip);
 
 				if (ns == 1) {
@@ -2037,32 +1423,22 @@ std::complex<double> metal(double ome) {
 				delete [] A;
 				delete [] B;
 
-				// ---- criterio viejo: se basa en el cambio relativo de |dip| ----
 				dnormem = steste * norm(dip);
 				dip     = numerical_output(E0, q, p);
 				dip_ss = std::sqrt(std::norm(dip));
 				alph    = dip / E0;
-				
 
 				if (t * 1.e+12 / omep > 2. * tpump) {
 
-					// 1) cambio relativo muy pequeño: estado estacionario alcanzado
 					if ( fabs((norm(dip) - dnormem) / norm(dip)) < 1.e-30
 						&& steste == 1 ) {
-						std::cout << std::endl;
-						std::cout << " 1st  E0 = " << E0
-								<< " Dip = " << dip_ss
-								<< " t = "   << t_ps;
-						std::cout << std::endl;
+						// Uncomment this block if you want to print the exit values
+						// std::cout << std::endl;
+						// std::cout << " 1st  E0 = " << E0
+						// 		<< " Dip = " << dip_ss
+						// 		<< " t = "   << t_ps;
+						// std::cout << std::endl;
 						break;
-					}
-
-					// 2) cuando el cambio relativo cae por debajo de 1e-10 empezamos a acumular para promedio
-					if ( fabs((norm(dip) - dnormem) / norm(dip)) < 1.e-10 )
-						wb = 1;
-
-					if (wb == 1) {
-						wave.push_back(q[0]);
 					}
 
 					if (AVE == 0) {
@@ -2080,31 +1456,25 @@ std::complex<double> metal(double ome) {
 
 						if ( fabs((dnavr - dnavrm) / dnavr) < 1.e-7
 							&& steste == 1 ) {
-							std::cout << std::endl;
-							std::cout << " 2nd E0 = " << E0
-									<< " Dip = " << dip_ss
-									<< " t = "   << t_ps;
-							std::cout << std::endl;
+							// Uncomment this block if you want to print the exit values
+							// std::cout << std::endl;
+							// std::cout << " 2nd E0 = " << E0
+							// 		<< " Dip = " << dip_ss
+							// 		<< " t = "   << t_ps;
+							// std::cout << std::endl;
 							break;
 						}
 					}
 				}
-
-				if (wave.size() >= 150000)
-					wave.erase(wave.begin(), wave.begin() + 50000);
-			} // fin while sobre t
+			} // end of while
 			
-
-			// escribir (t_final, E0) para este E0
-			// << "  " << std::setw(8)  << std::setiosflags(std::ios::left) << t_ps
 				dyna << " " << std::setw(13) << std::setiosflags(std::ios::left) << E0
 				<< "\t" << std::setw(13) << std::setiosflags(std::ios::left) << dip_ss
 				<< "\t" << std::setw(8)  << std::setiosflags(std::ios::left) << t_ps
 				<< std::endl;
 
-			wave.clear();
 			delete [] q;
-		} // fin for sobre E0
+		} //end of for over E0
 
 		delete [] p0;
 		delete [] p1;
@@ -2113,16 +1483,15 @@ std::complex<double> metal(double ome) {
 
 		dyna.close();
 
-		return dip;  // valor de dip para el último E0 simulado
+		return dip;
 	}
 
-			std::complex<double> probetest_N(char* mdl , char* mtl ,char* hst,
+	std::complex<double> probetest_second(char* mdl , char* mtl ,char* hst,
 								double nEsat, double omeeV, double tpump,
 								char* sol, double rho)
 	{
-		// Variables que no cambian dentro del bucle en E0
+
 		double eps_b, eps_s, ome, dt;
-		std::vector<std::complex<double>> wave;
 		int ns = 0;
 
 		std::complex<double> eps1e, eps2e, eps1, eps2, alph;
@@ -2147,11 +1516,10 @@ std::complex<double> metal(double ome) {
 		nv  = new double[4];
 		odv = new std::complex<double>[3];
 
-		//Abrimos el archivo de probetest
-
+		// Here we read the file written in the first loop and store the values in vectors
 		std::vector<double> E0_list, pss_list;
 
-		std::ifstream steady("../data/output/numtime.dat");
+		std::ifstream steady("../data/output/temporary.dat");
 		std::string line;
 		while (std::getline(steady, line)) {
 			if (line.size() == 0 || line[0] == '#') continue; // saltar comentarios
@@ -2163,7 +1531,6 @@ std::complex<double> metal(double ome) {
 		}
 		steady.close();
 
-		// Archivo de salida global del probetest
 		std::fstream dyna;
 		dyna.open("../data/output/probetime.dat", std::ios::out);
 
@@ -2180,8 +1547,6 @@ std::complex<double> metal(double ome) {
 		dyna << "# t (ps)"<< std::setw(8) << "E0" << std::setw(13) << "E0/Esat" << std::setw(13) << "Dipmax" << std::endl;
 		dyna << "#" << std::endl;
 
-
-		// Normalización de frecuencias, etc.
 		omep = eV2j * Ome_p * 2. * M_PI / h;
 		nv   = normalized_variables();
 		tau1 = nv[0];
@@ -2207,10 +1572,9 @@ std::complex<double> metal(double ome) {
 		eps1e = eps_inf + chiP;
 		eps2e = eps_b   + chiH;
 
-		double T = 100000 * omep * 1.e-12; // en unidades de ome_p
+		double T = 100000 * omep * 1.e-12; // in units of Ome_p
 		dt = 1.;
 		int Nt = T / dt;
-
 
 		for (size_t k = 0; k < E0_list.size(); ++k) {
 
@@ -2221,7 +1585,7 @@ std::complex<double> metal(double ome) {
 			double N = 0.0;
 			std::complex<double>* q = new std::complex<double>[3]{0.0, 0.0, 0.0};
 
-			// empezamos sin bombeo
+			// Variables for the (old) convergence criterion — reset for each E0
 			tildeN = 0.0;
 			int    i   = 0;
 			int    pip = 0;
@@ -2231,10 +1595,8 @@ std::complex<double> metal(double ome) {
 				t = i * dt;
 				i++;
 
-				// tiempo en ps
 				t_ps = t * 1.e+12 / omep;
-
-				// bombeo
+				//Pump function
 				dflt(&tildeN, t_ps, tpump, &pip);
 
 				if (ns == 1) {
@@ -2264,27 +1626,23 @@ std::complex<double> metal(double ome) {
 
 				if (t*1.e+12/omep > 2.0*tpump) {
 					if (mod_dip >= target) {
-						std::cout << std::endl;
-						std::cout << "E0 = " << E0 << " Dip = " << pss << " 0.9Dip = "<< mod_dip <<" t = " << t_ps;
-						std::cout << std::endl;
+						// Uncomment this block if you want to print the exit values
+						// std::cout << std::endl;
+						// std::cout << "E0 = " << E0 << " Dip = " << pss << " 0.9Dip = "<< mod_dip <<" t = " << t_ps;
+						// std::cout << std::endl;
 						break;
 					}
 				}
+			} // end of while
 
-				if (wave.size() >= 150000)
-					wave.erase(wave.begin(), wave.begin() + 50000);
-			} // fin while sobre t
-
-			// escribir (t_final, E0) para este E0
 			dyna << "  " << std::setw(8)  << std::setiosflags(std::ios::left) << t_ps
 				<< "\t" << std::setw(13) << std::setiosflags(std::ios::left) << E0
 				<< "\t" << std::setw(13) << std::setiosflags(std::ios::left) << Eratio
 				<< "\t" << std::setw(13) << std::setiosflags(std::ios::left) << pss
 				<< std::endl;
 
-			wave.clear();
 			delete [] q;
-		} // fin for sobre E0
+		} //
 
 		delete [] p0;
 		delete [] p1;
@@ -2293,10 +1651,10 @@ std::complex<double> metal(double ome) {
 
 		dyna.close();
 
-		return dip;  // valor de dip para el último E0 simulado
+		return dip;
 	}
 
-		std::complex<double> taucharacterization(char* mdl , char* mtl ,char* hst, double E0, double omeeV, double T, double tpump, char* sol=0, double rho=0){
+	std::complex<double> taucharacterization(char* mdl , char* mtl ,char* hst, double E0, double omeeV, double T, double tpump, char* sol=0, double rho=0){
 		double eps_b, eps_s, ome, dt, dnormem=1.e20, dnavr=0, dnavrm=1.e20;
 		std::vector<std::complex<double>> wave;
 		int ns=0, wb=0.;
@@ -2801,7 +2159,6 @@ std::complex<double> metal(double ome) {
 		std::fstream dyna, fnct;
 		dyna.open("../data/output/numtime.dat", std::ios::out);
 		fnct.open("../data/output/numfunc.dat", std::ios::out);
-		//prb.open("../data/output/probetime.dat", std::ios::out);
 		
 		dyna<<"# * NUMERICAL * "<<std::endl;
 		dyna<<"#"<<std::endl;
@@ -2836,7 +2193,6 @@ std::complex<double> metal(double ome) {
 		ome0 = nv[3];
 		GG = set_GG(G, tau2);
 
-		
 		p0 = pcfc0(ceps_inf, eps_b, eps_s, rho);
 		p1 = pcfc1(ceps_inf, eps_b, eps_s, rho);
 		p2 = pcfc2(ceps_inf, eps_b, eps_s, rho);
@@ -2877,39 +2233,28 @@ std::complex<double> metal(double ome) {
  		if(Nt > 500000) Nprint=500000;    
 		int iprint=Nt/Nprint;
 		GG = set_GG(G, tau2);
-		// let's begin without pump
+
 		tildeN = 0;
-	    
 		omeR = Rabi_frec(G, tau2, E0);
 		int i=0;
 
-		// These variables just work on specific functions
-		//int pip = 0;
+		// These variables are only used in specific pump functions
+		// int pip = 0;
 		double Tperiod = 50;
-		//double Eperiod;
-		//double duty = 0.5;
-		//double E0_temp = E0;
+		// double Eperiod;
+		// double duty = 0.5;
+		// double E0_temp = E0;
 
-		while (i<=Nt){// && (fabs(norm(dip)-dnormem)> 1.e-20 || t*1.e+12/omep<12*tpump)){
-		    t=i*dt;
+		while (i <= Nt) {
+			t = i * dt;
 			i++;
 
-		//Introduccion de una onda cuadrada para el bombeo
-		double t_ps    = t * 1.e+12 / omep;  // tiempo actual en ps
+			double t_ps = t * 1.e+12 / omep;  // current time in ps
 
-		//Introduction of a square wave as the electric field
-		//double local_t = fmod(t_ps, Eperiod);
-			    //if (local_t < duty * Eperiod) {
-			        //E0 = 0;
-			    //} else {
-			        //E0 = E0_temp;
-			    //}
-		
-		//dflt(&tildeN, t_ps, tpump, &pip);
-		//squarewave(&tildeN, Tperiod, duty, t_ps,tpump, &GG, G, tau2);
-		sinusoidalwave(&tildeN, Tperiod, t_ps, &GG, G, tau2);
-
-		//Aqui termina el cambio
+			// Pump functions
+			//dflt(&tildeN, t_ps, tpump, &pip);
+			//squarewave(&tildeN, Tperiod, duty, t_ps,tpump, &GG, G, tau2);
+			sinusoidalwave(&tildeN, Tperiod, t_ps, &GG, G, tau2);
 
 		    if (ns == 1) {
 				po  = numerical_output(E0, q, p0);
@@ -2928,9 +2273,6 @@ std::complex<double> metal(double ome) {
 			dnormem = steste * std::norm(dip_prev);
 			dip_ss = std::sqrt(std::norm(dip));
 			
-		    // dnormem = steste*norm(dip);
-		    // dip = numerical_output(E0, q, p);
-			// dip_ss = std::sqrt(std::norm(dip));
 		    alph = dip/E0;
 
 				if(i%iprint==0){
@@ -2941,8 +2283,8 @@ std::complex<double> metal(double ome) {
 					"\t"<<std::setw(13)<<std::setiosflags (std::ios::left)<<imag(dip)<<     // 5 Im(dip)
 					"\t"<<std::setw(13)<<std::setiosflags (std::ios::left)<<dip_ss<<      // dip modulus
 					"\t"<<std::setw(13)<<std::setiosflags (std::ios::left)<<N<<             // 6 N
-					// "\t"<<std::setw(13)<<std::setiosflags (std::ios::left)<<real(po)<<      // 7 Re(p0)
-					// "\t"<<std::setw(13)<<std::setiosflags (std::ios::left)<<imag(po)<<      // 8 Im(p0)
+					"\t"<<std::setw(13)<<std::setiosflags (std::ios::left)<<real(po)<<      // 7 Re(p0)
+					"\t"<<std::setw(13)<<std::setiosflags (std::ios::left)<<imag(po)<<      // 8 Im(p0)
 					std::endl;
 				fnct<<"  "<<std::setw(8)<<std::setiosflags (std::ios::left)<<t/omep*1.e+12<< // 1 time (ps)
 					"\t"<<std::setw(13)<<std::setiosflags (std::ios::left)<<real(q[0])<<   // 2 Re(q0)
@@ -2954,8 +2296,10 @@ std::complex<double> metal(double ome) {
 					"\t"<<std::setw(13)<<std::setiosflags (std::ios::left)<<N<<    // 8 N
 					std::endl;
 				}
-			//if (t*1.e+12/omep>2.*tpump){
+
+			if (t*1.e+12/omep>2.*tpump){
 				if (fabs((norm(dip)-dnormem)/norm(dip)) < 1.e-30 && steste==1){
+					// Uncomment this block if you want to print the exit values
 					//std::cout << std::endl;
 					//std::cout << " 1st " << "E0 = " << E0 << " " << "t = " << t_ps;
 					//std::cout << std::endl;
@@ -2967,6 +2311,7 @@ std::complex<double> metal(double ome) {
 				    wave.push_back(q[0]);
 				    }
 				if (fabs((dnavr-dnavrm)/dnavr) < 1.e-7 && steste==1) {
+					// Uncomment this block if you want to print the exit values
 					//std::cout << std::endl;
 					//std::cout << " 2nd " << "E0 = " << E0 << " " << "t = " << t_ps;
 					//std::cout << std::endl;
@@ -2982,14 +2327,13 @@ std::complex<double> metal(double ome) {
 					AVE=0;
 					dpTOT =0;
 					}
-				//}
+				}
 		    if (wave.size()>=150000) wave.erase(wave.begin(), wave.begin() +  50000);
 		    }
 		if (ns == 1){
 			if (wave.size()>0) nOme=nfindOme(wave.size(), wave, dt);
 				else nOme=0.;
 			}
-// 		std::cout<<"nOme = "<<nOme<<std::endl;
 		wave.clear();
 		delete [] p0;
 		delete [] p1;
@@ -2999,262 +2343,6 @@ std::complex<double> metal(double ome) {
 		return dip;
 		}
 
-	// 	std::complex<double> omegatest(
-	// 	char* mdl , char* mtl ,char* hst,
-	// 	double nEsat, double tpump,
-	// 	double E0, double ome1, double ome2,
-	// 	char* sol, double rho)
-	// {
-
-	// 	int Nfreq = 1;
-	// 	double omeeV = 0.0;
-	// 	double T = 0;
-	// 	//double omemin = 2.52;
-	// 	//double omemax = ome2*Ome_p;
-	// 	//double dome = (omemax - omemin) / (Nfreq - 1);
-
-    // 	std::fstream dyna;
-
-    //     dyna.open("../data/output/numtime.dat", std::ios::out);
-		
-
-	// 	// dyna<<"# * FREQUENCY TEST * "<<std::endl;
-	// 	// dyna<<"#"<<std::endl;
-	// 	// dyna<<"# file generated by ** cup.H ** "<<std::endl;
-	// 	// dyna<<"#"<<std::endl;
-	// 	// dyna<<"# PARAMETERS: "<<std::endl;
-	// 	// dyna<<"# G = "<< fabs(G) <<std::endl;
-	// 	// dyna<<"# E0 = "<<E0<<std::endl;
-    //     // dyna<<"# Esat = "<<nEsat<<std::endl;
-	// 	// dyna<<"# a "<<mdl<<" model was used for "<<mtl<<std::endl;
-	// 	// dyna<<"# ------------- "<<std::endl;
-	// 	// dyna<<"# t\t omeeV\t Dip_max"<<std::endl;
-	// 	// dyna<<"#"<<std::endl;
-
-	// 	OmegaPoint r{};
-
-	// 	for (int k = 0; k < Nfreq; ++k) {
-    //     	//omeeV = omemin + k * dome;
-	// 		//omeeV = omemax - k * dome;
-	// 		omeeV = 2.52;
-
-	// 		r = numerical1(mdl, mtl, hst, E0, omeeV, T, tpump, sol, rho);
-	// 			dyna<<"  "<<std::setw(8)<<std::setiosflags (std::ios::left)<<r.t_ps<< // 1 time (ps)
-	// 				"\t"<<std::setw(13)<<std::setiosflags (std::ios::left)<<omeeV<<      // dip_ss
-	// 				"\t"<<std::setw(13)<<std::setiosflags (std::ios::left)<<r.dip_ss<<      // dip modulus
-	// 				std::endl;
-	// 		}
-			
-	// 	 return {0.0, 0.0}; // o lo que quieras devolver
-	// 	}
-
-
-	// 	OmegaPoint numerical1(char* mdl , char* mtl ,char* hst, double E0, double omeeV, double T, double tpump, char* sol=0, double rho=0){
-		
-	// 	double eps_b, eps_s, ome, dt;
-	// 	int ns=0;
-	// 	if ((sol != NULL)) {
-	// 	    eps_s=set_host(sol);
-	// 	    ns=1;
-	// 	    }
-	// 	    else eps_s=0;
-	// 	eps_b=set_host(hst);
-	// 	int steste=1;
-	// 	T=147000;
-
-	// 	std::complex<double> eps1e, eps2e, eps1, eps2, alph;
-	// 	double omep, t, tau1, tau2, gamd, ome0, *nv, tildeN;
-	// 	std::complex<double> GG, OmeH, chiH, GamP, OmeP, chiP, **A, *B, *p0, *p1, *p2, *p3, *p, dip, po, *odv;
-	// 	double dip_ss = 0.0, t_ps = 0.0;
-
-	// 	double dpTOT=0, t0;
-	// 	double omeR;
-	// 	int AVE=0;
-		
-	// 	A = new std::complex<double>*[3];
-	// 	for(int i = 0; i <= 2; i++)
-	// 	    A[i] = new std::complex<double>[3];
-		
-	// 	B = new std::complex<double>[3];
-
-	// 	nv = new double[4];
-
-	// 	odv = new std::complex<double> [3];
-
-    // 	std::fstream dyna;
-
-    //     dyna.open("../data/output/probetime.dat", std::ios::out);
-		
-
-	// 	dyna<<"# * FREQUENCY TEST * "<<std::endl;
-	// 	dyna<<"#"<<std::endl;
-	// 	dyna<<"# file generated by ** cup.H ** "<<std::endl;
-	// 	dyna<<"#"<<std::endl;
-	// 	dyna<<"# PARAMETERS: "<<std::endl;
-	// 	dyna<<"# G = "<< fabs(G) <<std::endl;
-	// 	dyna<<"# E0 = "<<E0<<std::endl;
-    //     //dyna<<"# Esat = "<<nEsat<<std::endl;
-	// 	dyna<<"# a "<<mdl<<" model was used for "<<mtl<<std::endl;
-	// 	dyna<<"# ------------- "<<std::endl;
-	// 	dyna<<"# t\t omeeV\t Dip_max"<<std::endl;
-	// 	dyna<<"#"<<std::endl;
-
-
-
-	// 	omep = eV2j*Ome_p*2.*M_PI/h;
-	// 	// normalized variables
-	// 	nv = normalized_variables ();
-	// 	tau1 = nv[0];
-	// 	tau2 = nv[1];
-	// 	gamd = nv[2];
-	// 	ome0 = nv[3];
-	// 	GG = set_GG(G, tau2);
-
-	// 	p0 = pcfc0(ceps_inf, eps_b, eps_s, rho);
-	// 	p1 = pcfc1(ceps_inf, eps_b, eps_s, rho);
-	// 	p2 = pcfc2(ceps_inf, eps_b, eps_s, rho);
-	// 	p3 = pcfc3(ceps_inf, eps_b, eps_s, rho);
-	// 	if (ns == 1) p=p3;
-	// 	    else p=p0;
-
-	// 	ome = omeeV/Ome_p;
-		
-	// 	odv  = set_ome_dep_vrbls(ome, ome0, tau2, gamd);
-		
-	// 	OmeH = odv[0];
-	// 	OmeP = odv[1];
-	// 	GamP = odv[2];
-
-	// 	chiH = -GG/OmeH;
-	// 	chiP = -GamP/OmeP;
-
-	// 	eps1e = eps_inf + chiP;
-	// 	eps2e = eps_b   + chiH;
-
-
-	// 	// NUMERICAL SOLUTIONS
-	// 	T=T*omep*1.e-12; // in ome_p
-	// 	// Initial conditions
-	// 	dt  = 1.;
-		
-	// 	double N=0;
-	// 	std::complex<double> *q ;
-	// 	dip = 0.0;
-	// 	q = new std::complex<double>[3]{0.0,0.0,0.0};
-
-	// 	int Nt=T/dt;
-	// 	int Nprint=Nt;
-
-	// 	//if(Nt > 50000) Nprint=50000;    
- 	// 	if(Nt > 500000) Nprint=500000;    
-	// 	int iprint=Nt/Nprint;
-
-	// 	GG = set_GG(G, tau2);
-	// 	// let's begin without pump
-	// 	tildeN = 0;
-		
-	// 	double dnormem=1.e20, dnavr=0, dnavrm=1.e20;
-	    
-	// 	omeR = Rabi_frec(G, tau2, E0);
-	// 	int i=0;
-
-	// 	// These variables just work on specific functions
-	// 	int pip = 0;
-
-
-	// 		// std::cout << std::setprecision(17);
-	// 		// std::cout << "\n===== DEBUG numerical1 =====\n";
-	// 		// std::cout << "eps_b   = " << eps_b << "\n";
-	// 		// std::cout << "eps_s   = " << eps_s << "\n";
-	// 		// std::cout << "tau1    = " << tau1 << "\n";
-	// 		// std::cout << "tau2    = " << tau2 << "\n";
-	// 		// std::cout << "gamd    = " << gamd << "\n";
-	// 		// std::cout << "ome0    = " << ome0 << "\n";
-	// 		// std::cout << "GG      = " << GG << "\n";
-	// 		// std::cout << "OmeH    = " << OmeH << "\n";
-	// 		// std::cout << "OmeP    = " << OmeP << "\n";
-	// 		// std::cout << "GamP    = " << GamP << "\n";
-	// 		// std::cout << "omeeV   = " << omeeV << "\n";
-	// 		// std::cout << "============================\n";
-
-	// 	while (i<=Nt){// && (fabs(norm(dip)-dnormem)> 1.e-20 || t*1.e+12/omep<12*tpump)){
-	// 	    t=i*dt;
-	// 		i++;
-
-	// 	//Introduccion de una onda cuadrada para el bombeo
-	// 	t_ps    = t * 1.e+12 / omep;  // tiempo actual en ps
-		
-	// 	dflt(&tildeN, t_ps, tpump, &pip);
-	// 	//squarewave(&tildeN, Tperiod, duty, t_ps,tpump, &GG, G, tau2);
-	// 	//sinusoidalwave(&tildeN, Tperiod, t_ps, &GG, G, tau2);
-
-	// 	//Aqui termina el cambio
-
-	// 	    if (ns == 1) {
-	// 			po  = numerical_output(E0, q, p0);
-	// 			N   = Runge_Kutta_mono_4 (N, -1./tau1, tildeN/tau1+imag(q[0]*conj(po)), dt);
-	// 			} else N = 1;
-	// 	    A   = coefficients(OmeH, OmeP, GG*N, GamP, p0, p1, p2);
-	// 	    B   = inhomogeneous(GG*N, GamP, E0, p0, p1, p2);
-	// 	    q   = Runge_Kutta_4 (q, A, B, dt);
-		    
-	// 	    for(int ix = 0; ix <= 2; ix++) delete [] A[ix];
-	// 	    delete [] A;
-	// 	    delete [] B;
-
-	// 		std::complex<double> dip_prev = dip;
-	// 		dip = numerical_output(E0, q, p);
-	// 		dnormem = steste * std::norm(dip_prev);
-	// 		dip_ss = std::sqrt(std::norm(dip));
-
-	// 		if (i <= 3) {
-	// 		 std::cout << std::setprecision(17)
-	// 		<< "i="<<i
-	// 		<< " t_ps="<<t_ps
-	// 		<< " tildeN="<<tildeN
-	// 		<< " N="<<N
-	// 		<< " q0="<<q[0] << " q1="<<q[1] << " q2="<<q[2]
-	// 		<< " dip="<<dip
-	// 		<< "\n";
-	// 		}
-
-	// 		if(i%iprint==0){
-	// 			dyna<<"  "<<std::setw(8)<<std::setiosflags (std::ios::left)<<t/omep*1.e+12<< // 1 time (ps)
-	// 				"\t"<<std::setw(13)<<std::setiosflags (std::ios::left)<<real(dip)<<     // 4 Re(dip)
-	// 				"\t"<<std::setw(13)<<std::setiosflags (std::ios::left)<<imag(dip)<<     // 5 Im(dip)
-	// 				"\t"<<std::setw(13)<<std::setiosflags (std::ios::left)<<dip_ss<<      // dip modulus
-
-	// 				std::endl;
-	// 			}
-
-	// 		//if (t*1.e+12/omep>2.*tpump){
-	// 			if (fabs((norm(dip)-dnormem)/norm(dip)) < 1.e-30 && steste==1){
-	// 				break;
-	// 			}
-	// 			if (fabs((dnavr-dnavrm)/dnavr) < 1.e-7 && steste==1) {
-	// 				break;}
-	// 			if (AVE==0){
-	// 				t0=t;
-	// 				AVE=1;
-	// 				}
-	// 			dpTOT = dpTOT+norm(dip);
-	// 			if (t-t0 >= 1000/omeR){
-	// 				dnavrm=dnavr;
-	// 				dnavr=dpTOT/(t-t0);
-	// 				AVE=0;
-	// 				dpTOT =0;
-	// 				}
-	// 			//}
-	// 	    }
-	// 	delete [] p0;
-	// 	delete [] p1;
-	// 	delete [] p2;
-	// 	delete [] p3;
-	// 	delete [] q;
-		
-	// 	return OmegaPoint{t_ps, dip_ss};
-	// 	}
-    
 
 	    std::complex<double> analytical(char* mdl , char* mtl ,char* hst, double E0, double omeeV, double T, double tpump, char* sol=0, double rho=0){
 		double eps_b, eps_s, ome, dt, dnormem=1.e20;

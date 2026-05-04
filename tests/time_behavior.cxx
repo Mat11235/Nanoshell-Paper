@@ -33,8 +33,7 @@ g++ -Wall -I/usr/include/ -L/usr/local/lib time_behavior.cxx -o tim -lgsl -lgslc
 using namespace std;
 
 int main(int argc, char** argv) {
-    // Initialize variables for input parameters
-    // Create an instance of the nanosphere class
+    // Initialize variables for input parameters, and create an instance of the nanosphere class
     double   omeeV, omemi, omema, E0, rho, *fro, tpump, T, eps3, eps_b;
     char mtl[16], mdl[16], hst[16], sol[16], active[16];
     if (argv[1]==0){
@@ -58,18 +57,7 @@ int main(int argc, char** argv) {
     eps3=simulation.set_host(sol);
     eps_b=simulation.set_host(hst);
     
-    // Perform the time_behavior calculation
-
- 
     fro=simulation.frohlich(omemi, omema, eps_b, eps3, rho);
-    // Calculate the saturation electric field Esat
-    //double ntau1, ntau2;
-    //ntau2 = 2./simulation.Dome;
-    //ntau1 = 5.*ntau2;
-
-    //double nEsat = sqrt(1/(fabs(simulation.G)*ntau1));
-    //double nEsatup2 = 1/(fabs(simulation.G)*ntau1);
-
 	
     // Inform the user about the test
     cout << "Calculating the time_behavior up to "<<T<<" ps\n";
@@ -85,17 +73,11 @@ int main(int argc, char** argv) {
     cout << "  Solvent: " << sol << "\n";
     cout << "  Radius ratio: " << rho << "\n\n";
 
-    //cout << "Running analytical calculation...\n";
-    //simulation.analytical(mdl, mtl, hst, E0, omeeV, T, tpump, sol, rho);
+    cout << "Running analytical calculation...\n";
+    simulation.analytical(mdl, mtl, hst, E0, omeeV, T, tpump, sol, rho);
+
     cout << "Running numerical calculation...\n";
     simulation.numerical(mdl, mtl, hst, E0, omeeV, T, tpump, sol, rho);
-	//cout<<endl;
-    //cout<<" > nEsat    = "<< nEsat <<endl;
-	//cout<<endl;
-    //cout << "Running probe field loop test...\n";
-    //simulation.probetest(mdl, mtl, hst, nEsat, omeeV, tpump, sol, rho);
-
-    // Output the results
 
     // Save the results to a file
     ofstream output("results/time_behavior.log");
