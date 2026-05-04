@@ -125,7 +125,7 @@ int main(int argc, char** argv) {
         cout.precision(10);
         cout.setf(ios::fixed);
         cout <<"> Output saved in the following files:"<<endl;
-	    cout<<">   ../data/output/freqtime.dat"<<endl;
+	    cout<<">   ../data/output/omegatest.dat"<<endl;
         cout<<"> log saved in results/time_behavior.log"<<endl;
     } else {
         cerr << "Error: Could not open file for writing results.\n";
